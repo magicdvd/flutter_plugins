@@ -4,7 +4,7 @@ import Foundation
 
 public class MdWindowManager: NSObject {
     // 静态常量，只有第一次访问时会被初始化
-    static let instance = MdWindowManager()
+    static let instance: MdWindowManager = MdWindowManager()
 
     private var windows: [String: MdWindow] = [:]
 

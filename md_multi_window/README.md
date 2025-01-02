@@ -48,7 +48,8 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
     RegisterGeneratedPlugins(registry: flutterViewController)
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
     window.hideOnLaunch = true
-
+    // whether to terminate the app while this window is the last closed window
+    window.lastWindowClosedShouldTerminateApp = true
     // important!!! create channel with this view controller with this window
     MdMultiWindowPlugin.attachChannelWithMain(with: flutterViewController, window: window)
     // important!!! set callback after window creation, it is used to register flutter plugin with other created window
@@ -62,13 +63,9 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
 
 ```dart
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
-// [anyWindowID] is the parameter [windowID] in MdMultiWindow.createWindow, or first window 'md_mulit_window_main'
-// be carefull, it should be always return false for [hideOnLaunch = true], for some special window return true
+// determined by thie last MdFlutterWindow's property [lastWindowClosedShouldTerminateApp]
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    if NSApp.windows[0].identifier?.rawValue == "anyWindowID" {
-        return true
-    }
-    return false
+    return MdMultiWindowPlugin.handleApplicationShouldTerminateAfterLastWindowClosed(sender)
 }
 ```
 

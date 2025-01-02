@@ -48,6 +48,7 @@ class WindowStyle {
   final String title;
   final bool titleShow;
   final bool hideOnLaunch;
+  final bool lastWindowClosedShouldTerminateApp;
   const WindowStyle(
       {this.offset = const Offset(0, 0),
       this.size = const Size(800, 600),
@@ -55,7 +56,8 @@ class WindowStyle {
       this.center = true,
       this.title = '',
       this.titleShow = true,
-      this.hideOnLaunch = false});
+      this.hideOnLaunch = false,
+      this.lastWindowClosedShouldTerminateApp = false});
   // 自定义 toJson 方法
   Map<String, dynamic> toJson() {
     return {
@@ -69,6 +71,7 @@ class WindowStyle {
       'tt': title,
       'tts': titleShow,
       'i': hideOnLaunch,
+      'l': lastWindowClosedShouldTerminateApp
     };
   }
 }

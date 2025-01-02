@@ -4,6 +4,25 @@ import FlutterMacOS
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
+  public static func handleApplicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication)
+    -> Bool
+  {
+    if sender.windows.count != 1 {
+      return false
+    }
+    guard let window = sender.windows[0] as? MdFlutterWindow else {
+      debugPrint(
+        "macos:",
+        "handleApplicationShouldTerminateAfterLastWindowClosed window is not MdFlutterWindow, return false"
+      )
+      return false
+    }
+    if !window.windowCanBeShown {
+      return false
+    }
+    return window.lastWindowClosedShouldTerminateApp
+  }
+
   // register do nothing
   public static func register(with registrar: FlutterPluginRegistrar) {
     // do nothing

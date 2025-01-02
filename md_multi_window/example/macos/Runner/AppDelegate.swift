@@ -23,6 +23,7 @@ class AppDelegate: FlutterAppDelegate {
 
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
     window.hideOnLaunch = true
+    window.lastWindowClosedShouldTerminateApp = true
 
     MdMultiWindowPlugin.attachChannelWithMain(with: flutterViewController, window: window)
     MdMultiWindowPlugin.setOnWindowCreated { viewController in
@@ -32,11 +33,7 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    print("Number of windows: \(NSApp.windows.count)")
-    if NSApp.windows.count == 1 {
-      debugPrint(NSApp.windows[0].identifier?.rawValue)
-    }
-    return false
+    return MdMultiWindowPlugin.handleApplicationShouldTerminateAfterLastWindowClosed(sender)
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {

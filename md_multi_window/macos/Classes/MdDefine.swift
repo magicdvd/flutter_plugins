@@ -18,6 +18,7 @@ struct MdWindowStyle: Codable {
     let title: String
     let titleShow: Bool
     let hideOnLaunch: Bool
+    let lastWindowClosedShouldTerminateApp: Bool
     enum CodingKeys: String, CodingKey {
         case width = "w"
         case height = "h"
@@ -29,6 +30,7 @@ struct MdWindowStyle: Codable {
         case title = "tt"
         case titleShow = "tts"
         case hideOnLaunch = "i"
+        case lastWindowClosedShouldTerminateApp = "l"
     }
     func styleMask() -> NSWindow.StyleMask {
         var mask: NSWindow.StyleMask = []

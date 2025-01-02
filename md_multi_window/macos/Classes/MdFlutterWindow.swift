@@ -6,6 +6,9 @@ open class MdFlutterWindow: NSWindow {
 
   open var hideOnLaunch: Bool = false
 
+  // whether self is the last window closed should terminate app
+  open var lastWindowClosedShouldTerminateApp: Bool = false
+
   override public var canBecomeKey: Bool {
     return true
   }
