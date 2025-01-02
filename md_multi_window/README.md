@@ -19,7 +19,9 @@ create first window manually without xib
 // macos/Runner/AppDelegate.swift
 // import pacakge
 import md_multi_window
+```
 
+```swift
 // applicationDidFinishLaunching, create custom window, make its lifecycle controlled by md_multi_window
 override func applicationDidFinishLaunching(_ notification: Notification) {
     // frame size
@@ -56,7 +58,9 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
     // show the window (if hideOnLaunch is true, winodw will not be shown)
     window.makeKeyAndOrderFront(nil)
   }
+```
 
+```swift
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
 // [anyWindowID] is the parameter [windowID] in MdMultiWindow.createWindow, or first window 'md_mulit_window_main'
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -65,7 +69,9 @@ override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplic
     }
     return true
 }
+```
 
+```swift
 // applicationShouldHandleReopen which is called while user is clicking the app icon on the dock
 // it is used to make window shown after the window is hidden by 'window.hide()'
 override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool)
@@ -79,7 +85,6 @@ override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleW
     }
     return true
 }
-
 ```
 
 ## flutter
