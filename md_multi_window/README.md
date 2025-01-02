@@ -41,9 +41,9 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
     // customize your window style as your wish
     window.titleVisibility = .hidden
     window.titlebarAppearsTransparent = true
-     window.center()
     // set the frame size, keep it resize to size exactly
     window.setFrame(rect, display: true)
+    window.center()
     // register the flutter's plugins with this controller
     RegisterGeneratedPlugins(registry: flutterViewController)
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
@@ -63,11 +63,12 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
 ```dart
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
 // [anyWindowID] is the parameter [windowID] in MdMultiWindow.createWindow, or first window 'md_mulit_window_main'
+// be carefull, it should be always return false for [hideOnLaunch = true], for some special window return true
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     if NSApp.windows[0].identifier?.rawValue == "anyWindowID" {
-        return false
+        return true
     }
-    return true
+    return false
 }
 ```
 
