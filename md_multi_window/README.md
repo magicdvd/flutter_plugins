@@ -15,13 +15,13 @@ create first window manually without xib
 1. remove MainMenu.xib from project
 2. modify AppDelegate.swift
 
-```swift
-// macos/Runner/AppDelegate.swift
-// import pacakge
+```dart
+//macos/Runner/AppDelegate.swift
+//import pacakge
 import md_multi_window
 ```
 
-```swift
+```dart
 // applicationDidFinishLaunching, create custom window, make its lifecycle controlled by md_multi_window
 override func applicationDidFinishLaunching(_ notification: Notification) {
     // frame size
@@ -60,7 +60,7 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
   }
 ```
 
-```swift
+```dart
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
 // [anyWindowID] is the parameter [windowID] in MdMultiWindow.createWindow, or first window 'md_mulit_window_main'
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -71,7 +71,7 @@ override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplic
 }
 ```
 
-```swift
+```dart
 // applicationShouldHandleReopen which is called while user is clicking the app icon on the dock
 // it is used to make window shown after the window is hidden by 'window.hide()'
 override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool)
