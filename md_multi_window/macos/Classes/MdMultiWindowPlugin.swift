@@ -11,24 +11,31 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
 
   // [attachChannelWithMain] it is called by system (after first window created, need )
   public static func attachChannelWithMain(
-    with registry: FlutterViewController, firstWindowID name: String = "md_mulit_window_main"
+    with registry: FlutterViewController,
+    firstWindowID name: String = "md_mulit_window_main", window iwindow: MdFlutterWindow? = nil
   ) {
     let registar = registry.registrar(forPlugin: "MdMultiWindowPlugin")
     // attach channel for flutterViewController(flutter engine)
     let methodCh = attachChannel(with: registar)
-    guard let app = NSApplication.shared.delegate as? FlutterAppDelegate else {
-      debugPrint(
-        "macos:",
-        "failed to find flutter main window, application delegate is not FlutterAppDelegate")
-      return
-    }
-    guard let window = app.mainFlutterWindow else {
-      debugPrint("macos:", "failed to find flutter main window")
-      return
+    var mWindow: MdFlutterWindow
+    if iwindow == nil {
+      guard let app = NSApplication.shared.delegate as? FlutterAppDelegate else {
+        debugPrint(
+          "macos:",
+          "failed to find flutter main window, application delegate is not FlutterAppDelegate")
+        return
+      }
+      guard let window = app.mainFlutterWindow as? MdFlutterWindow else {
+        debugPrint("macos:", "failed to find flutter main window(make sure it is MdFlutterWindow)")
+        return
+      }
+      mWindow = window
+    } else {
+      mWindow = iwindow!
     }
     // attach the NSWindow(created by flutter xib)
     let mainWindow = MdWindow(
-      id: name, window: window, methodChannel: methodCh)
+      id: name, window: mWindow, methodChannel: methodCh)
     MdWindowManager.instance.addWindowAndNotifyAll(windowID: name, window: mainWindow)
   }
 
@@ -54,6 +61,8 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
       return
     }
     switch action {
+    case "canBeShown":
+      window.setCanBeShown(true)
     case "sendData":
       result(true)
       var mp = params

@@ -60,6 +60,8 @@ class MdMultiWindowPlatformMacOS extends MdMultiWindowPlatform {
         if (params.containsKey('sender')) {
           MdMultiWindow.messager?.recieveData(params['sender']!, params);
         }
+      case 'onHide':
+        MdMultiWindow.delegate?.onHide();
       case 'onClose':
         MdMultiWindow.delegate?.onClose();
       case 'onMinmize':

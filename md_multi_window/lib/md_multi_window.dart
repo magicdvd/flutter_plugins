@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:md_multi_window/md_multi_window_platform_macos.dart';
 import 'package:md_multi_window/src/md_window.dart';
 import 'package:md_multi_window/src/md_defines.dart';
@@ -16,6 +17,8 @@ export 'package:md_multi_window/src/md_window_bridge.dart';
 
 const _callArgName = 'md_multi_window';
 const _windowIdMain = 'md_mulit_window_main';
+
+T? _ambiguate<T>(T? value) => value;
 
 class MdMultiWindow {
   static get defaultMainWindowID => _windowIdMain;
@@ -50,6 +53,7 @@ class MdMultiWindow {
     _windowsMap.remove(id);
   }
 
+  // addWindow add window
   static void addWindow(String id) {
     _windowsMap[id] = MdWindow(id);
   }
@@ -106,6 +110,21 @@ class MdMultiWindow {
     return (_current!, initRoute, arguments);
   }
 
+  // widgetsDidLoad after widgets has loaded
+  static widgetsDidLoad(VoidCallback callback, {bool showWindow = false}) {
+    _ambiguate(WidgetsBinding.instance)!
+        .waitUntilFirstFrameRasterized
+        .then((value) {
+      MdMultiWindowPlatform.instance
+          .doAction(currentWindow.id, currentWindow.id, "canBeShown");
+      callback();
+      if (showWindow) {
+        currentWindow.show();
+      }
+    });
+  }
+
+  // createWindow create window with specified style
   static Future<String?> createWindow(
       {String? windowID,
       WindowStyle style = WindowStyle.defaultStyle,

@@ -8,6 +8,7 @@ void main(List<String> arguments) async {
   WidgetsFlutterBinding.ensureInitialized();
   await MdMultiWindow.ensureInitialized(arguments);
   runApp(const MyApp());
+  MdMultiWindow.widgetsDidLoad(() {}, showWindow: true);
 }
 
 class MyApp extends StatefulWidget {
@@ -115,6 +116,11 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
   @override
   void onMinimize() {
     debugPrint("callback min");
+  }
+
+  @override
+  void onHide() {
+    debugPrint("callback hide");
   }
 
   @override

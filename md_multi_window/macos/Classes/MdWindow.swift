@@ -4,7 +4,7 @@ import Foundation
 
 public class MdWindow: NSObject {
   public let id: String
-  public let window: NSWindow
+  public let window: MdFlutterWindow
   private let methodChannel: FlutterMethodChannel
 
   private var shouldClose: Bool = true
@@ -12,7 +12,7 @@ public class MdWindow: NSObject {
   private var preventCloseForceClose: Bool = false
 
   init(
-    id: String, window: NSWindow, methodChannel: FlutterMethodChannel
+    id: String, window: MdFlutterWindow, methodChannel: FlutterMethodChannel
   ) {
     window.identifier = NSUserInterfaceItemIdentifier(rawValue: id)
     self.window = window
@@ -38,6 +38,7 @@ public class MdWindow: NSObject {
   }
 
   func hide() {
+    sendToFlutter(event: "onHide")
     window.orderOut(nil)
   }
 
@@ -58,6 +59,10 @@ public class MdWindow: NSObject {
 
   func setTitle(_ title: String) {
     window.title = title
+  }
+
+  func setCanBeShown(_ b: Bool) {
+    window.windowCanBeShown = b
   }
 
   func close() {

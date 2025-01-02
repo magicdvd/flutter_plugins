@@ -33,7 +33,7 @@ public class MdWindowManager: NSObject {
         id: String, windowStyle style: MdWindowStyle, route: String?, params: [String: String]?
     ) -> MdWindow {
         let rect = NSRect(x: style.x, y: style.y, width: style.width, height: style.height)
-        let window = NSWindow(
+        let window = MdFlutterWindow(
             contentRect: rect,
             styleMask: style.styleMask(),
             backing: .buffered,
@@ -58,8 +58,7 @@ public class MdWindowManager: NSObject {
         } else {
             window.titleVisibility = .hidden
         }
-        window.isOpaque = false
-        window.backgroundColor = NSColor.clear
+        window.hideOnLaunch = style.hideOnLaunch
         window.titlebarAppearsTransparent = style.titlebarAppearsTransparent
         window.setFrame(rect, display: true)
         if style.center {

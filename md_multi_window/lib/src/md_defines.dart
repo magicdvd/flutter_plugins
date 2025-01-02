@@ -47,13 +47,15 @@ class WindowStyle {
   final bool center;
   final String title;
   final bool titleShow;
+  final bool hideOnLaunch;
   const WindowStyle(
       {this.offset = const Offset(0, 0),
       this.size = const Size(800, 600),
       this.style = StyleMaskMix.normal,
       this.center = true,
       this.title = '',
-      this.titleShow = true});
+      this.titleShow = true,
+      this.hideOnLaunch = false});
   // 自定义 toJson 方法
   Map<String, dynamic> toJson() {
     return {
@@ -65,7 +67,8 @@ class WindowStyle {
       'ts': style.titlebarAppearsTransparent,
       'c': center,
       'tt': title,
-      'tts': titleShow
+      'tts': titleShow,
+      'i': hideOnLaunch,
     };
   }
 }
