@@ -4,7 +4,7 @@ import Foundation
 
 public class MdWindow: NSObject {
   public let id: String
-  public let window: MdFlutterWindow
+  private weak var window: MdFlutterWindow?
   private var methodChannel: FlutterMethodChannel
 
   private var shouldClose: Bool = true
@@ -12,70 +12,116 @@ public class MdWindow: NSObject {
   private var preventCloseForceClose: Bool = false
 
   init(
-    id: String, window: MdFlutterWindow, methodChannel: FlutterMethodChannel
+    id: String, window: MdFlutterWindow?, methodChannel: FlutterMethodChannel
   ) {
-    window.identifier = NSUserInterfaceItemIdentifier(rawValue: id)
+    window?.identifier = NSUserInterfaceItemIdentifier(rawValue: id)
     self.window = window
     self.id = id
     self.methodChannel = methodChannel
     super.init()
-    self.window.delegate = self
+    self.window?.delegate = self
+  }
+
+  convenience init(
+    id: String, windowStyle style: MdWindowStyle, route: String?, params: [String: String]?
+  ) {
+    let rect = NSRect(x: style.x, y: style.y, width: style.width, height: style.height)
+    var window: MdFlutterWindow?
+    window = MdFlutterWindow(
+      contentRect: rect,
+      styleMask: style.styleMask(),
+      backing: .buffered,
+      defer: false,
+      trafficLightsOffset: CGPoint(
+        x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
+      trafficLightsSpacingFix: style.trafficLightsSpacingFix)
+    window!.isReleasedWhenClosed = true
+    let project = FlutterDartProject()
+    let initRoute = route ?? ""
+    if let r = params {
+      let args = encodeToString(r)
+      project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute, args]
+    } else {
+      project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute]
+    }
+    let flutterViewController = FlutterViewController(project: project)
+    let plugin = flutterViewController.registrar(forPlugin: "MdMultiWindowPlugin")
+    let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
+    MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
+    window?.contentViewController = flutterViewController
+    window?.title = style.title
+    if style.titleShow {
+      window?.titleVisibility = .visible
+    } else {
+      window?.titleVisibility = .hidden
+    }
+    window?.hideOnLaunch = style.hideOnLaunch
+    window?.titlebarAppearsTransparent = style.titlebarAppearsTransparent
+    window?.setFrame(rect, display: true)
+    if style.center {
+      window?.center()  // Center the window
+    }
+    window?.makeKeyAndOrderFront(nil)
+    self.init(id: id, window: window, methodChannel: methodCh)
   }
 
   deinit {
-    logMessage("macos:", "release window resource:\(id)")
-    window.delegate = nil
-    if let flutterViewController = window.contentViewController as? FlutterViewController {
+    logMessage("macos:", "release window resource:\(id) \(window)")
+    window?.delegate = nil
+    if let flutterViewController = window?.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()
     }
-    window.contentViewController = nil
-    window.windowController = nil
+    window?.contentViewController = nil
+    window?.windowController = nil
+    window?.close()
+    window = nil
   }
 
   func show() {
-    window.makeKeyAndOrderFront(nil)
+    window?.makeKeyAndOrderFront(nil)
     NSApp.activate(ignoringOtherApps: true)
   }
 
   func hide() {
     MdMultiWindowPlugin.shouldTerminateApp = false
     sendToFlutter(event: "onHide")
-    window.orderOut(nil)
+    window?.orderOut(nil)
   }
 
   func center() {
-    window.center()
+    window?.center()
   }
 
   func setFrame(_ frame: NSRect, _ keepCenter: Bool = false) {
     var newFrame = frame
     if keepCenter {
-      let cFrame = window.frame
-      let nx = cFrame.origin.x + (cFrame.size.width - frame.width) / 2
-      let ny = cFrame.origin.y + (cFrame.size.height - frame.height) / 2
-      newFrame = NSRect(x: nx, y: ny, width: frame.width, height: frame.height)
-
+      let cFrame = window?.frame
+      if cFrame != nil {
+        let nx = cFrame!.origin.x + (cFrame!.size.width - frame.width) / 2
+        let ny = cFrame!.origin.y + (cFrame!.size.height - frame.height) / 2
+        newFrame = NSRect(x: nx, y: ny, width: frame.width, height: frame.height)
+      }
     }
-    window.setFrame(newFrame, display: false, animate: true)
+    window?.setFrame(newFrame, display: false, animate: true)
   }
 
   func setTitle(_ title: String) {
-    window.title = title
+    window?.title = title
   }
 
   func setCanBeShown() {
     MdMultiWindowPlugin.windowInCreation = false
-    window.windowCanBeShown = true
+    window?.windowCanBeShown = true
   }
 
   // close the window
   func close() {
-    window.close()
+    window?.close()
   }
 
   // close the window, trigger should close callback
   func performClose() {
-    window.performClose(nil)
+    window?.performClose(nil)
   }
 
   func preventClose(_ b: Bool) {
@@ -93,7 +139,7 @@ public class MdWindow: NSObject {
   func preventCloseEnd(_ b: Bool) {
     if b {
       preventCloseForceClose = true
-      window.close()
+      window?.close()
     } else {
       preventCloseProcessing = false
     }
@@ -122,7 +168,7 @@ extension MdWindow: NSWindowDelegate {
     MdWindowManager.instance.removeWindowAndNotifyAll(id: id)
     preventCloseForceClose = false
     preventCloseProcessing = false
-    MdMultiWindowPlugin.shouldTerminateApp = window.lastWindowClosedShouldTerminateApp
+    MdMultiWindowPlugin.shouldTerminateApp = window!.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onClose")
   }
 

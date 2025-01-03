@@ -1,7 +1,7 @@
 import Cocoa
 import FlutterMacOS
 
-func logMessage(_ items: Any..., terminator: String = "\n") {
+public func logMessage(_ items: Any..., terminator: String = "\n") {
   #if DEBUG
     debugPrint(items, terminator: terminator)
   #else

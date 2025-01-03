@@ -34,8 +34,7 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return MdMultiWindowPlugin.shouldTerminateApp
-    //return true
+    return false
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
@@ -45,9 +44,11 @@ class AppDelegate: FlutterAppDelegate {
   override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool)
     -> Bool
   {
+    logMessage("reopen", sender.windows.count)
     if !flag {
       for window in sender.windows {
         // 如果没有可见窗口，则重新显示窗口
+        logMessage("reopen \(window)")
         window.makeKeyAndOrderFront(nil)
       }
     }

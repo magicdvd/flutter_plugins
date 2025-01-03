@@ -37,42 +37,7 @@ public class MdWindowManager: NSObject {
     internal func createWindow(
         id: String, windowStyle style: MdWindowStyle, route: String?, params: [String: String]?
     ) -> MdWindow {
-        let rect = NSRect(x: style.x, y: style.y, width: style.width, height: style.height)
-        let window = MdFlutterWindow(
-            contentRect: rect,
-            styleMask: style.styleMask(),
-            backing: .buffered,
-            defer: false,
-            trafficLightsOffset: CGPoint(
-                x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
-            trafficLightsSpacingFix: style.trafficLightsSpacingFix)
-        let project = FlutterDartProject()
-        let initRoute = route ?? ""
-        if let r = params {
-            let args = encodeToString(r)
-            project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute, args]
-        } else {
-            project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute]
-        }
-        let flutterViewController = FlutterViewController(project: project)
-        let plugin = flutterViewController.registrar(forPlugin: "MdMultiWindowPlugin")
-        let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
-        MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
-        window.contentViewController = flutterViewController
-        window.isReleasedWhenClosed = true
-        window.title = style.title
-        if style.titleShow {
-            window.titleVisibility = .visible
-        } else {
-            window.titleVisibility = .hidden
-        }
-        window.hideOnLaunch = style.hideOnLaunch
-        window.titlebarAppearsTransparent = style.titlebarAppearsTransparent
-        window.setFrame(rect, display: true)
-        if style.center {
-            window.center()  // Center the window
-        }
-        return MdWindow(id: id, window: window, methodChannel: methodCh)
+        return MdWindow(id: id, windowStyle: style, route: route, params: params)
     }
 
     public func getAllWindowIDs() -> [String] {
