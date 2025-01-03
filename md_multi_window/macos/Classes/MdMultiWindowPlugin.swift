@@ -4,7 +4,19 @@ import FlutterMacOS
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
-  public static var shouldTerminateApp: Bool = false
+  public static var windowInCreation: Bool = false
+  private static var _shouldTerminateApp = false
+  public static var shouldTerminateApp: Bool {
+    get {
+      if windowInCreation {
+        return false
+      }
+      return _shouldTerminateApp
+    }
+    set {
+      _shouldTerminateApp = newValue
+    }
+  }
 
   // register do nothing
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -64,7 +76,7 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
     }
     switch action {
     case "canBeShown":
-      window.setCanBeShown(true)
+      window.setCanBeShown()
     case "sendData":
       result(true)
       var mp = params

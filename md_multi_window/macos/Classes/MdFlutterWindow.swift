@@ -12,9 +12,10 @@ open class MdFlutterWindow: NSWindow {
     }
     set {
       if newValue {
+        MdMultiWindowPlugin.windowInCreation = true
         MdMultiWindowPlugin.shouldTerminateApp = false
-        _hideOnLaunch = true
       }
+      _hideOnLaunch = newValue
     }
   }
 

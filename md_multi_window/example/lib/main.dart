@@ -79,9 +79,9 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
               center: true,
               size: Size(0, 0)));
     }
-    // if (MdMultiWindow.currentWindow.id == MdMultiWindow.defaultMainWindowID) {
-    //   MdMultiWindow.currentWindow.close();
-    // }
+    if (MdMultiWindow.currentWindow.id == MdMultiWindow.defaultMainWindowID) {
+      MdMultiWindow.currentWindow.close();
+    }
   }
 
   void closeTest(String id) {

@@ -38,7 +38,7 @@ public class MdWindow: NSObject {
   }
 
   func hide() {
-    MdMultiWindowPlugin.shouldTerminateApp = window.lastWindowClosedShouldTerminateApp
+    MdMultiWindowPlugin.shouldTerminateApp = false
     sendToFlutter(event: "onHide")
     window.orderOut(nil)
   }
@@ -63,8 +63,9 @@ public class MdWindow: NSObject {
     window.title = title
   }
 
-  func setCanBeShown(_ b: Bool) {
-    window.windowCanBeShown = b
+  func setCanBeShown() {
+    MdMultiWindowPlugin.windowInCreation = false
+    window.windowCanBeShown = true
   }
 
   // close the window
