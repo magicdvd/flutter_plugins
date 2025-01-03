@@ -14,6 +14,7 @@ class AppDelegate: FlutterAppDelegate {
       defer: false, trafficLightsOffset: CGPoint(x: 10, y: -10), trafficLightsSpacingFix: -5)
     let flutterViewController = FlutterViewController()
     window.isReleasedWhenClosed = true
+    window.makeKeyAndOrderFront(nil)
     window.contentViewController = flutterViewController
     window.title = "BigTitle"
     window.titleVisibility = .visible
@@ -30,7 +31,6 @@ class AppDelegate: FlutterAppDelegate {
     MdMultiWindowPlugin.setOnWindowCreated { viewController in
       RegisterGeneratedPlugins(registry: viewController)
     }
-    window.makeKeyAndOrderFront(nil)
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

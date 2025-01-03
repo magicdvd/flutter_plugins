@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
                 titleShow: true,
                 title: nid,
                 center: false,
-                size: Size(0, 0)));
+                size: Size(800, 600)));
         continue;
       }
 
@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
               titleShow: true,
               title: nid,
               center: true,
-              size: Size(0, 0)));
+              size: Size(800, 600)));
     }
     if (MdMultiWindow.currentWindow.id == MdMultiWindow.defaultMainWindowID) {
       MdMultiWindow.currentWindow.close();

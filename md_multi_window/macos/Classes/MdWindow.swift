@@ -36,6 +36,7 @@ public class MdWindow: NSObject {
         x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
       trafficLightsSpacingFix: style.trafficLightsSpacingFix)
     window!.isReleasedWhenClosed = true
+    window?.makeKeyAndOrderFront(nil)
     let project = FlutterDartProject()
     let initRoute = route ?? ""
     if let r = params {
@@ -61,12 +62,11 @@ public class MdWindow: NSObject {
     if style.center {
       window?.center()  // Center the window
     }
-    window?.makeKeyAndOrderFront(nil)
     self.init(id: id, window: window, methodChannel: methodCh)
   }
 
   deinit {
-    logMessage("macos:", "release window resource:\(id) \(window)")
+    logMessage("macos:", "release window resource:\(id) \(window ?? "nil")")
     window?.delegate = nil
     if let flutterViewController = window?.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()
