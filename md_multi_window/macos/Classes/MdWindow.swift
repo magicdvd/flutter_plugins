@@ -4,12 +4,14 @@ import Foundation
 
 public class MdWindow: NSObject {
   public let id: String
-  private weak var window: MdFlutterWindow?
+  private var window: MdFlutterWindow?
   private var methodChannel: FlutterMethodChannel
 
   private var shouldClose: Bool = true
   private var preventCloseProcessing: Bool = false
   private var preventCloseForceClose: Bool = false
+
+  weak var delegate: MdWindowManagerDelegate?
 
   init(
     id: String, window: MdFlutterWindow?, methodChannel: FlutterMethodChannel
@@ -35,7 +37,7 @@ public class MdWindow: NSObject {
       trafficLightsOffset: CGPoint(
         x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
       trafficLightsSpacingFix: style.trafficLightsSpacingFix)
-    window!.isReleasedWhenClosed = true
+    window!.isReleasedWhenClosed = false
     let project = FlutterDartProject()
     let initRoute = route ?? ""
     if let r = params {
@@ -67,13 +69,13 @@ public class MdWindow: NSObject {
 
   deinit {
     logMessage("macos:", "release window resource:\(id) \(String(describing: window))")
+    printRetainCount(of: window!)
     window?.delegate = nil
     if let flutterViewController = window?.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()
     }
     window?.contentViewController = nil
     window?.windowController = nil
-    window?.close()
     window = nil
   }
 
@@ -129,7 +131,10 @@ public class MdWindow: NSObject {
   }
 
   func sendData(_ data: [String: String]) {
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        return
+      }
       self.methodChannel.invokeMethod(
         "recieveData", arguments: data
       )
@@ -146,7 +151,10 @@ public class MdWindow: NSObject {
   }
 
   internal func notifyFlutter(name: String, fromWindowID: String) {
-    DispatchQueue.main.async {
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self else {
+        return
+      }
       self.methodChannel.invokeMethod(
         name, arguments: fromWindowID
       )
@@ -165,11 +173,25 @@ extension MdWindow: NSWindowDelegate {
   }
 
   public func windowWillClose(_ notification: Notification) {
-    MdWindowManager.instance.removeWindowAndNotifyAll(id: id)
+    MdMultiWindowPlugin.shouldTerminateApp = window!.lastWindowClosedShouldTerminateApp
+    logMessage("will close", id)
+    delegate?.willClose(windowID: id)
     preventCloseForceClose = false
     preventCloseProcessing = false
-    MdMultiWindowPlugin.shouldTerminateApp = window!.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onClose")
+
+    // DispatchQueue.main.async { [weak window] in
+    //   guard let window = window else {
+    //     return
+    //   }
+    //   window.delegate = nil
+    //   if let flutterViewController = window.contentViewController as? FlutterViewController {
+    //     flutterViewController.engine.shutDownEngine()
+    //   }
+    //   window.contentViewController = nil
+    //   window.windowController = nil
+    //   window.unbindObserver()
+    // }
   }
 
   public func windowShouldClose(_ sender: NSWindow) -> Bool {

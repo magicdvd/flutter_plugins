@@ -24,10 +24,6 @@ open class MdFlutterWindow: NSWindow {
   // whether self is the last window closed should terminate app
   open var lastWindowClosedShouldTerminateApp: Bool = false
 
-  // override public var canBecomeKey: Bool {
-  //   return true
-  // }
-
   public init(
     contentRect: NSRect, styleMask style: NSWindow.StyleMask,
     backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool,
@@ -42,24 +38,37 @@ open class MdFlutterWindow: NSWindow {
     // traffic lights position must be recalculated on any resize step
     NotificationCenter.default.addObserver(
       forName: NSWindow.didResizeNotification, object: self, queue: OperationQueue.main
-    ) { Notification in
+    ) { [weak self] Notification in
+      guard let self = self else {
+        return
+      }
       self.adjustTrafficLights(offset: trafficLightsOffset, spacingFix: trafficLightsSpacingFix)
     }
 
     // during exiting from full screen reposition works bad. This part fixes behavior
     NotificationCenter.default.addObserver(
       forName: NSWindow.willExitFullScreenNotification, object: self, queue: OperationQueue.main
-    ) { Notification in
+    ) { [weak self] Notification in
+      guard let self = self else {
+        return
+      }
       self.inFullScreenTransition = true
       self.adjustTrafficLights(offset: trafficLightsOffset, spacingFix: trafficLightsSpacingFix)
     }
     NotificationCenter.default.addObserver(
       forName: NSWindow.didExitFullScreenNotification, object: self, queue: OperationQueue.main
-    ) { Notification in
+    ) { [weak self] Notification in
+      guard let self = self else {
+        return
+      }
       self.inFullScreenTransition = false
       self.adjustTrafficLights(offset: trafficLightsOffset, spacingFix: trafficLightsSpacingFix)
     }
   }
+
+  // public func unbindObserver() {
+  //   NotificationCenter.default.removeObserver(self)
+  // }
 
   deinit {
     NotificationCenter.default.removeObserver(self)

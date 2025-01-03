@@ -18,20 +18,11 @@ public class MdWindowManager: NSObject {
     // }
 
     internal func addWindowAndNotifyAll(windowID id: String, window: MdWindow) {
-        for (_, window) in windows {
-            window.notifyFlutter(name: "notifyWindowCreated", fromWindowID: id)
+        for (_, w) in windows {
+            w.notifyFlutter(name: "notifyWindowCreated", fromWindowID: id)
         }
         windows[id] = window
-    }
-
-    internal func removeWindowAndNotifyAll(id: String) {
-        for (wid, window) in windows {
-            if wid == id {
-                continue
-            }
-            window.notifyFlutter(name: "notifyWindowClose", fromWindowID: id)
-        }
-        windows.removeValue(forKey: id)
+        window.delegate = self
     }
 
     internal func createWindow(
@@ -50,5 +41,21 @@ public class MdWindowManager: NSObject {
         } else {
             return nil  // 键不存在时返回 nil
         }
+    }
+}
+
+protocol MdWindowManagerDelegate: AnyObject {
+    func willClose(windowID: String)
+}
+
+extension MdWindowManager: MdWindowManagerDelegate {
+    func willClose(windowID: String) {
+        for (wid, window) in windows {
+            if wid == windowID {
+                continue
+            }
+            window.notifyFlutter(name: "notifyWindowClose", fromWindowID: windowID)
+        }
+        windows.removeValue(forKey: windowID)
     }
 }

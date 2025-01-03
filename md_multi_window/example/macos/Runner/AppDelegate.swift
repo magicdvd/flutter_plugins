@@ -11,21 +11,20 @@ class AppDelegate: FlutterAppDelegate {
       contentRect: rect,
       styleMask: [.titled, .closable, .resizable, .miniaturizable],
       backing: .buffered,
-      defer: false, trafficLightsOffset: CGPoint(x: 10, y: -10), trafficLightsSpacingFix: -5)
+      defer: false, trafficLightsSpacingFix: -5)
     let flutterViewController = FlutterViewController()
-    window.isReleasedWhenClosed = true
-    window.makeKeyAndOrderFront(nil)
+    window.isReleasedWhenClosed = false
     window.contentViewController = flutterViewController
     window.title = "BigTitle"
     window.titleVisibility = .visible
     window.titlebarAppearsTransparent = false
-    window.setFrame(rect, display: true)
-    window.center()
-    RegisterGeneratedPlugins(registry: flutterViewController)
-
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
     window.hideOnLaunch = true
     window.lastWindowClosedShouldTerminateApp = true
+    window.setFrame(rect, display: true)
+    window.center()
+    window.makeKeyAndOrderFront(nil)
+    RegisterGeneratedPlugins(registry: flutterViewController)
 
     MdMultiWindowPlugin.attachChannelWithMain(with: flutterViewController, window: window)
     MdMultiWindowPlugin.setOnWindowCreated { viewController in
@@ -34,7 +33,7 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return false
+    return MdMultiWindowPlugin.shouldTerminateApp
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {

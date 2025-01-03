@@ -105,10 +105,10 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
         }
       }
     case "close":
-      DispatchQueue.main.async {
-        window.close()
-        result(true)
-      }
+      //DispatchQueue.main.async {
+      window.close()
+      result(true)
+    //}
     case "performClose":
       DispatchQueue.main.async {
         window.performClose()
@@ -201,19 +201,18 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
     case "createWindow":
-      DispatchQueue.main.async {
-        if let args = call.arguments as? String,
-          let arguments = decodeJSON(from: args, to: MdCallArguments.self)
-        {
-          let window = MdWindowManager.instance.createWindow(
-            id: arguments.windowID, windowStyle: arguments.windowStyle!, route: arguments.initRoute,
-            params: arguments.extraParams)
-          MdWindowManager.instance.addWindowAndNotifyAll(
-            windowID: arguments.windowID, window: window)
-          result(window.id)
-        } else {
-          result("")
-        }
+      if let args = call.arguments as? String,
+        let arguments = decodeJSON(from: args, to: MdCallArguments.self)
+      {
+        var window: MdWindow? = MdWindowManager.instance.createWindow(
+          id: arguments.windowID, windowStyle: arguments.windowStyle!, route: arguments.initRoute,
+          params: arguments.extraParams)
+        MdWindowManager.instance.addWindowAndNotifyAll(
+          windowID: arguments.windowID, window: window!)
+        result(arguments.windowID)
+        window = nil
+      } else {
+        result("")
       }
     case "action":
       guard let args = call.arguments as? String else {

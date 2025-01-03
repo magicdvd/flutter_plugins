@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
     }
   }
 
-  void openTest() {
+  void openTest() async {
     var ids = MdMultiWindow.getWindowIDs();
     if (ids.length == 3) {
       debugPrint('exampe create two specified window [w1, w2] only');
@@ -53,11 +53,9 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
         continue;
       }
       if (nid == 'w2') {
-        MdMultiWindow.createWindow(
+        await MdMultiWindow.createWindow(
             windowID: nid,
             style: WindowStyle(
-                trafficLightsOffset: Offset(5, -5),
-                trafficLightsSpacingFix: 0,
                 style: StyleMaskMix.hidden,
                 hideOnLaunch: false,
                 titleShow: true,
@@ -67,11 +65,9 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
         continue;
       }
 
-      MdMultiWindow.createWindow(
+      await MdMultiWindow.createWindow(
           windowID: nid,
           style: WindowStyle(
-              trafficLightsOffset: Offset(10, -10),
-              trafficLightsSpacingFix: -5,
               style: StyleMaskMix.normal,
               hideOnLaunch: true,
               titleShow: true,
@@ -80,7 +76,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
               size: Size(800, 600)));
     }
     if (MdMultiWindow.currentWindow.id == MdMultiWindow.defaultMainWindowID) {
-      MdMultiWindow.currentWindow.close();
+      await MdMultiWindow.currentWindow.close();
     }
   }
 

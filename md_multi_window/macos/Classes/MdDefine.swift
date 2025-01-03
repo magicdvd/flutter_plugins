@@ -1,6 +1,11 @@
 import Cocoa
 import Foundation
 
+func printRetainCount(of object: AnyObject) {
+    let count = CFGetRetainCount(object)
+    print("Retain count of \(object): \(count)")
+}
+
 //MdWindowStyle 调用的窗口样式表述
 struct MdWindowStyle: Codable {
     let gTitleStyle: [Int: NSWindow.StyleMask] = [
