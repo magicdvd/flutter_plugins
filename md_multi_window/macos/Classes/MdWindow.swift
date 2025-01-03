@@ -66,7 +66,7 @@ public class MdWindow: NSObject {
   }
 
   deinit {
-    logMessage("macos:", "release window resource:\(id) \(window ?? "nil")")
+    logMessage("macos:", "release window resource:\(id) \(String(describing: window))")
     window?.delegate = nil
     if let flutterViewController = window?.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()
