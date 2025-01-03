@@ -36,8 +36,6 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
     let flutterViewController = FlutterViewController()
     // set window's view controllerr
     window.contentViewController = flutterViewController
-    // important!!! it should be set (its memeory is controlled by class MdFlutterWindow with package md_mulit_window)
-    window.isReleasedWhenClosed = false
     // customize your window style as your wish
     window.titleVisibility = .hidden
     window.titlebarAppearsTransparent = true
@@ -65,7 +63,7 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
 // determined by thie last MdFlutterWindow's property [lastWindowClosedShouldTerminateApp]
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return MdMultiWindowPlugin.handleApplicationShouldTerminateAfterLastWindowClosed(sender)
+    return MdMultiWindowPlugin.couldTermiateApp
 }
 ```
 
@@ -104,7 +102,7 @@ void main(List<String> arguments) async {
 
 Optional
 
-1. prevent close, you could do some external logical when 'window.close' is trigger , or the close button is clicked on title bar
+1. prevent close, you could do some external logical when 'window.performClose' is trigger , or the close button is clicked on title bar
 
 ```dart
 // prevent any window on close action
@@ -130,7 +128,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate
         MdMultiWindow.delegate = this;
     }
 
-    // the callback is called , when the window which prevented close in close lifecycle (window.close is trigger , or the close button on titlebar is clicked)
+    // the callback is called , when the window which prevented close in close lifecycle (window.performClose is trigger , or the close button on titlebar is clicked)
     // the window will be closed , while the future result is true,
     // otherwise nothing happen.
     @override

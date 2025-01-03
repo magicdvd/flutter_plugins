@@ -9,14 +9,14 @@ class AppDelegate: FlutterAppDelegate {
     let rect = NSRect(x: 0, y: 0, width: 800, height: 600)
     let window = MdFlutterWindow(
       contentRect: rect,
-      styleMask: [.titled, .fullSizeContentView, .closable, .resizable, .miniaturizable],
+      styleMask: [.titled, .closable, .resizable, .miniaturizable],
       backing: .buffered,
-      defer: false)
+      defer: false, trafficLightsOffset: CGPoint(x: 10, y: -10), trafficLightsSpacingFix: -5)
     let flutterViewController = FlutterViewController()
     window.contentViewController = flutterViewController
-    window.isReleasedWhenClosed = false
-    window.titleVisibility = .hidden
-    window.titlebarAppearsTransparent = true
+    window.title = "BigTitle"
+    window.titleVisibility = .visible
+    window.titlebarAppearsTransparent = false
     window.setFrame(rect, display: true)
     window.center()
     RegisterGeneratedPlugins(registry: flutterViewController)
@@ -33,7 +33,8 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return MdMultiWindowPlugin.handleApplicationShouldTerminateAfterLastWindowClosed(sender)
+    return MdMultiWindowPlugin.couldTermiateApp
+    //return true
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {

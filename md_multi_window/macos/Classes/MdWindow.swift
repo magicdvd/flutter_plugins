@@ -5,7 +5,7 @@ import Foundation
 public class MdWindow: NSObject {
   public let id: String
   public let window: MdFlutterWindow
-  private let methodChannel: FlutterMethodChannel
+  private var methodChannel: FlutterMethodChannel
 
   private var shouldClose: Bool = true
   private var preventCloseProcessing: Bool = false
@@ -38,6 +38,7 @@ public class MdWindow: NSObject {
   }
 
   func hide() {
+    MdMultiWindowPlugin.couldTermiateApp = window.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onHide")
     window.orderOut(nil)
   }
@@ -53,6 +54,7 @@ public class MdWindow: NSObject {
       let nx = cFrame.origin.x + (cFrame.size.width - frame.width) / 2
       let ny = cFrame.origin.y + (cFrame.size.height - frame.height) / 2
       newFrame = NSRect(x: nx, y: ny, width: frame.width, height: frame.height)
+
     }
     window.setFrame(newFrame, display: false, animate: true)
   }
@@ -65,7 +67,13 @@ public class MdWindow: NSObject {
     window.windowCanBeShown = b
   }
 
+  // close the window
   func close() {
+    window.close()
+  }
+
+  // close the window, trigger should close callback
+  func performClose() {
     window.performClose(nil)
   }
 
@@ -101,17 +109,18 @@ public class MdWindow: NSObject {
 
 extension MdWindow: NSWindowDelegate {
   internal func sendToFlutter(event: String) {
-    DispatchQueue.main.async {
-      self.methodChannel.invokeMethod(
-        event, arguments: self.id
-      )
-    }
+    //DispatchQueue.main.async {
+    self.methodChannel.invokeMethod(
+      event, arguments: self.id
+    )
+    //}
   }
 
   public func windowWillClose(_ notification: Notification) {
     MdWindowManager.instance.removeWindowAndNotifyAll(id: id)
     preventCloseForceClose = false
     preventCloseProcessing = false
+    MdMultiWindowPlugin.couldTermiateApp = window.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onClose")
   }
 
@@ -133,7 +142,6 @@ extension MdWindow: NSWindowDelegate {
   }
 
   public func windowWillMiniaturize(_ notification: Notification) {
-    debugPrint("on minimize", id)
     sendToFlutter(event: "onMinimize")
   }
 

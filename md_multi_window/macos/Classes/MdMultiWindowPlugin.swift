@@ -4,24 +4,7 @@ import FlutterMacOS
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
-  public static func handleApplicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication)
-    -> Bool
-  {
-    if sender.windows.count != 1 {
-      return false
-    }
-    guard let window = sender.windows[0] as? MdFlutterWindow else {
-      debugPrint(
-        "macos:",
-        "handleApplicationShouldTerminateAfterLastWindowClosed window is not MdFlutterWindow, return false"
-      )
-      return false
-    }
-    if !window.windowCanBeShown {
-      return false
-    }
-    return window.lastWindowClosedShouldTerminateApp
-  }
+  public static var couldTermiateApp: Bool = false
 
   // register do nothing
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -68,7 +51,7 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   }
 
   private func actionToNative(_ args: String, _ result: @escaping FlutterResult) {
-    debugPrint("macos:", args)
+    // debugPrint("macos:", args)
     guard let arguments = decodeJSON(from: args, to: MdCallArguments.self),
       let tid = arguments.targetWindowID,
       let window = MdWindowManager.instance.getWindow(id: tid),
@@ -104,6 +87,11 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
     case "close":
       DispatchQueue.main.async {
         window.close()
+        result(true)
+      }
+    case "performClose":
+      DispatchQueue.main.async {
+        window.performClose()
         result(true)
       }
     case "show":

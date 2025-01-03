@@ -1,13 +1,12 @@
 import Cocoa
 import Foundation
 
-let gTitleStyle: [Int: NSWindow.StyleMask] = [
-    1: .titled, 2: .closable, 3: .resizable, 4: .miniaturizable, 5: .fullScreen,
-    6: .borderless, 7: .fullSizeContentView,
-]
-
 //MdWindowStyle 调用的窗口样式表述
 struct MdWindowStyle: Codable {
+    let gTitleStyle: [Int: NSWindow.StyleMask] = [
+        1: .titled, 2: .closable, 3: .resizable, 4: .miniaturizable, 5: .fullScreen,
+        6: .borderless, 7: .fullSizeContentView,
+    ]
     let width: CGFloat
     let height: CGFloat
     let x: CGFloat
@@ -19,6 +18,9 @@ struct MdWindowStyle: Codable {
     let titleShow: Bool
     let hideOnLaunch: Bool
     let lastWindowClosedShouldTerminateApp: Bool
+    let trafficLightsOffsetX: CGFloat
+    let trafficLightsOffsetY: CGFloat
+    let trafficLightsSpacingFix: CGFloat
     enum CodingKeys: String, CodingKey {
         case width = "w"
         case height = "h"
@@ -31,6 +33,9 @@ struct MdWindowStyle: Codable {
         case titleShow = "tts"
         case hideOnLaunch = "i"
         case lastWindowClosedShouldTerminateApp = "l"
+        case trafficLightsOffsetX = "tx"
+        case trafficLightsOffsetY = "ty"
+        case trafficLightsSpacingFix = "tb"
     }
     func styleMask() -> NSWindow.StyleMask {
         var mask: NSWindow.StyleMask = []

@@ -12,6 +12,11 @@ public class MdWindowManager: NSObject {
         super.init()
     }
 
+    // deinit {
+    //     windows.removeAll()
+    //     debugPrint("MdWindowManager released")
+    // }
+
     internal func addWindowAndNotifyAll(windowID id: String, window: MdWindow) {
         for (_, window) in windows {
             window.notifyFlutter(name: "notifyWindowCreated", fromWindowID: id)
@@ -37,7 +42,10 @@ public class MdWindowManager: NSObject {
             contentRect: rect,
             styleMask: style.styleMask(),
             backing: .buffered,
-            defer: true)
+            defer: false,
+            trafficLightsOffset: CGPoint(
+                x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
+            trafficLightsSpacingFix: style.trafficLightsSpacingFix)
         let project = FlutterDartProject()
         let initRoute = route ?? ""
         if let r = params {
@@ -51,7 +59,7 @@ public class MdWindowManager: NSObject {
         let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
         MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
         window.contentViewController = flutterViewController
-        window.isReleasedWhenClosed = false
+        window.isReleasedWhenClosed = true
         window.title = style.title
         if style.titleShow {
             window.titleVisibility = .visible
@@ -64,7 +72,6 @@ public class MdWindowManager: NSObject {
         if style.center {
             window.center()  // Center the window
         }
-        //window.setIsVisible(false)
         return MdWindow(id: id, window: window, methodChannel: methodCh)
     }
 

@@ -22,9 +22,9 @@ mixin MdWindowDelegate {
   // window is about to minimized
   void onMinimize() {}
 
-  // shouldClose [action:preventClose] called, when call window.close, or system close
-  // 1. windw.preventClose(true)
-  // 2. window.close()
+  // shouldClose [action:preventClose] called, when call window.performClose, or system close
+  // 1. window.preventClose(true)
+  // 2. window.performClose()
   // 3. delegate: shouldClose
   //    a. false: no thing happen
   //    b. true: deleate: onClose

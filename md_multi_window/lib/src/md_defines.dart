@@ -49,6 +49,8 @@ class WindowStyle {
   final bool titleShow;
   final bool hideOnLaunch;
   final bool lastWindowClosedShouldTerminateApp;
+  final double trafficLightsSpacingFix;
+  final Offset trafficLightsOffset;
   const WindowStyle(
       {this.offset = const Offset(0, 0),
       this.size = const Size(800, 600),
@@ -57,7 +59,9 @@ class WindowStyle {
       this.title = '',
       this.titleShow = true,
       this.hideOnLaunch = false,
-      this.lastWindowClosedShouldTerminateApp = false});
+      this.lastWindowClosedShouldTerminateApp = false,
+      this.trafficLightsOffset = const Offset(0, 0),
+      this.trafficLightsSpacingFix = 0});
   // 自定义 toJson 方法
   Map<String, dynamic> toJson() {
     return {
@@ -71,7 +75,10 @@ class WindowStyle {
       'tt': title,
       'tts': titleShow,
       'i': hideOnLaunch,
-      'l': lastWindowClosedShouldTerminateApp
+      'l': lastWindowClosedShouldTerminateApp,
+      'tb': trafficLightsSpacingFix,
+      'tx': trafficLightsOffset.dx,
+      'ty': trafficLightsOffset.dy
     };
   }
 }

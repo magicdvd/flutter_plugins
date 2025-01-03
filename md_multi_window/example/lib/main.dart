@@ -52,10 +52,29 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
       if (mp.containsKey(nid)) {
         continue;
       }
+      if (nid == 'w2') {
+        MdMultiWindow.createWindow(
+            windowID: nid,
+            style: WindowStyle(
+                trafficLightsOffset: Offset(5, -5),
+                trafficLightsSpacingFix: 0,
+                style: StyleMaskMix.hidden,
+                hideOnLaunch: false,
+                titleShow: true,
+                title: nid,
+                center: false,
+                size: Size(0, 0)));
+        continue;
+      }
+
       MdMultiWindow.createWindow(
           windowID: nid,
           style: WindowStyle(
-              style: StyleMaskMix.hidden,
+              trafficLightsOffset: Offset(10, -10),
+              trafficLightsSpacingFix: -5,
+              style: StyleMaskMix.normal,
+              hideOnLaunch: true,
+              titleShow: true,
               title: nid,
               center: true,
               size: Size(0, 0)));
@@ -150,7 +169,6 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
     setState(() {
       MdMultiWindow.currentWindow
           .setFrame(Offset.zero, Size(800, 600), keepCenter: true);
-      MdMultiWindow.currentWindow.center();
       _platformVersion = platformVersion;
     });
   }
