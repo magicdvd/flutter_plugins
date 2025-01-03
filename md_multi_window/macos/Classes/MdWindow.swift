@@ -23,7 +23,7 @@ public class MdWindow: NSObject {
   }
 
   deinit {
-    debugPrint("macos:", "release window resource:\(id)")
+    logMessage("macos:", "release window resource:\(id)")
     window.delegate = nil
     if let flutterViewController = window.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()
@@ -110,6 +110,7 @@ public class MdWindow: NSObject {
 
 extension MdWindow: NSWindowDelegate {
   internal func sendToFlutter(event: String) {
+    logMessage("macos:", "send to flutter", event)
     //DispatchQueue.main.async {
     self.methodChannel.invokeMethod(
       event, arguments: self.id

@@ -14,7 +14,7 @@ public class MdWindowManager: NSObject {
 
     // deinit {
     //     windows.removeAll()
-    //     debugPrint("MdWindowManager released")
+    //     logMessage("MdWindowManager released")
     // }
 
     internal func addWindowAndNotifyAll(windowID id: String, window: MdWindow) {

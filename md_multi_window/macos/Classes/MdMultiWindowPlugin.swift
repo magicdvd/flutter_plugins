@@ -1,6 +1,14 @@
 import Cocoa
 import FlutterMacOS
 
+func logMessage(_ items: Any..., terminator: String = "\n") {
+  #if DEBUG
+    debugPrint(items, terminator: terminator)
+  #else
+    // 发布模式下不打印
+  #endif
+}
+
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
@@ -34,13 +42,13 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
     var mWindow: MdFlutterWindow
     if iwindow == nil {
       guard let app = NSApplication.shared.delegate as? FlutterAppDelegate else {
-        debugPrint(
+        logMessage(
           "macos:",
           "failed to find flutter main window, application delegate is not FlutterAppDelegate")
         return
       }
       guard let window = app.mainFlutterWindow as? MdFlutterWindow else {
-        debugPrint("macos:", "failed to find flutter main window(make sure it is MdFlutterWindow)")
+        logMessage("macos:", "failed to find flutter main window(make sure it is MdFlutterWindow)")
         return
       }
       mWindow = window
@@ -63,14 +71,14 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   }
 
   private func actionToNative(_ args: String, _ result: @escaping FlutterResult) {
-    // debugPrint("macos:", args)
+    logMessage("macos:", args)
     guard let arguments = decodeJSON(from: args, to: MdCallArguments.self),
       let tid = arguments.targetWindowID,
       let window = MdWindowManager.instance.getWindow(id: tid),
       let params = arguments.extraParams,
       let action = params["name"]
     else {
-      debugPrint("macos:", "failed not enough params", args)
+      logMessage("macos:", "failed not enough params", args)
       result(false)
       return
     }
@@ -185,7 +193,7 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
         result(true)
       }
     default:
-      debugPrint("macos:", action, "failed action not found")
+      logMessage("macos:", action, "failed action not found")
       result(false)
     }
   }

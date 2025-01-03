@@ -63,7 +63,7 @@ open class MdFlutterWindow: NSWindow {
 
   deinit {
     NotificationCenter.default.removeObserver(self)
-    debugPrint("MdFlutterWindow released")
+    logMessage("MdFlutterWindow released")
   }
 
   override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
@@ -109,7 +109,7 @@ open class MdFlutterWindow: NSWindow {
         titleView!.frame = titleFrame
       }
     } else {
-      debugPrint("macos:", "titleBar offset y is more than the height of button, do nothing")
+      logMessage("macos:", "titleBar offset y is more than the height of button, do nothing")
     }
     let windowButtons = [close, miniaturize, zoom]
     var spaceBetween = miniaturize.frame.origin.x - close.frame.origin.x - close.frame.size.width

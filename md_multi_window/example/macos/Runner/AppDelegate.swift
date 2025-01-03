@@ -13,6 +13,7 @@ class AppDelegate: FlutterAppDelegate {
       backing: .buffered,
       defer: false, trafficLightsOffset: CGPoint(x: 10, y: -10), trafficLightsSpacingFix: -5)
     let flutterViewController = FlutterViewController()
+    window.isReleasedWhenClosed = true
     window.contentViewController = flutterViewController
     window.title = "BigTitle"
     window.titleVisibility = .visible

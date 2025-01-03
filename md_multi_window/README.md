@@ -113,7 +113,7 @@ void preventClose(String id) {
         // the window will not be closeable
         window.preventClose(true);
     } else {
-        debugPrint('window not exist');
+        logMessage('window not exist');
     }
 }
 ```
@@ -133,7 +133,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate
     // otherwise nothing happen.
     @override
     Future<bool> shouldClose() async {
-        debugPrint("onShouldClose");
+        logMessage("onShouldClose");
         // delay close (example delay return true)
         return Future.delayed(Duration(seconds: 5), () => true);
     }
@@ -165,7 +165,7 @@ class _MyAppState extends State<MyApp> with MdWindowBridge
     //recieve data
     @override
     void recieveData(String senderWindowID, Map<String, String> params) {
-        debugPrint('recievedata $senderWindowID, $params');
+        logMessage('recievedata $senderWindowID, $params');
     }
 
 ```

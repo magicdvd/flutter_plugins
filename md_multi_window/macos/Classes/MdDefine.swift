@@ -65,7 +65,7 @@ struct MdCallArguments: Codable {
 // decode json
 func decodeJSON<T: Codable>(from jsonString: String, to type: T.Type) -> T? {
     guard let jsonData = jsonString.data(using: .utf8) else {
-        debugPrint("macos:", "unable to convert string to data.")
+        logMessage("macos:", "unable to convert string to data.")
         return nil
     }
     let decoder = JSONDecoder()
@@ -73,7 +73,7 @@ func decodeJSON<T: Codable>(from jsonString: String, to type: T.Type) -> T? {
         let decodedObject = try decoder.decode(T.self, from: jsonData)
         return decodedObject
     } catch {
-        debugPrint("macos:", "decoding JSON: \(error)")
+        logMessage("macos:", "decoding JSON: \(error)")
         return nil
     }
 }
@@ -90,12 +90,12 @@ func encodeToString<T: Codable>(_ object: T) -> String {
         if let jsonString = String(data: encodedData, encoding: .utf8) {
             return jsonString
         } else {
-            debugPrint("Error: Unable to convert Data to String.")
+            logMessage("Error: Unable to convert Data to String.")
             return "{}"
         }
     } catch {
         // 错误处理
-        debugPrint("Error encoding object: \(error)")
+        logMessage("Error encoding object: \(error)")
         return "{}"
     }
 }
