@@ -38,7 +38,7 @@ public class MdWindow: NSObject {
   }
 
   func hide() {
-    MdMultiWindowPlugin.couldTermiateApp = window.lastWindowClosedShouldTerminateApp
+    MdMultiWindowPlugin.shouldTerminateApp = window.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onHide")
     window.orderOut(nil)
   }
@@ -120,7 +120,7 @@ extension MdWindow: NSWindowDelegate {
     MdWindowManager.instance.removeWindowAndNotifyAll(id: id)
     preventCloseForceClose = false
     preventCloseProcessing = false
-    MdMultiWindowPlugin.couldTermiateApp = window.lastWindowClosedShouldTerminateApp
+    MdMultiWindowPlugin.shouldTerminateApp = window.lastWindowClosedShouldTerminateApp
     sendToFlutter(event: "onClose")
   }
 

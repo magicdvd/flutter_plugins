@@ -63,7 +63,7 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
 // applicationShouldTerminateAfterLastWindowClosed (you can make app terminated or not by last window is closed/hide)
 // determined by thie last MdFlutterWindow's property [lastWindowClosedShouldTerminateApp]
 override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return MdMultiWindowPlugin.couldTermiateApp
+    return MdMultiWindowPlugin.shouldTerminateApp
 }
 ```
 

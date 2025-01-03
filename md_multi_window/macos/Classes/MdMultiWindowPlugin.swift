@@ -4,7 +4,7 @@ import FlutterMacOS
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
-  public static var couldTermiateApp: Bool = false
+  public static var shouldTerminateApp: Bool = false
 
   // register do nothing
   public static func register(with registrar: FlutterPluginRegistrar) {

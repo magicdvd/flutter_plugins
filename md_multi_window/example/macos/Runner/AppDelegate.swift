@@ -33,7 +33,7 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return MdMultiWindowPlugin.couldTermiateApp
+    return MdMultiWindowPlugin.shouldTerminateApp
     //return true
   }
 
