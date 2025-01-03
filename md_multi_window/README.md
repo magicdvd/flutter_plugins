@@ -32,6 +32,8 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
       styleMask: [.titled, .fullSizeContentView, .closable, .resizable, .miniaturizable],
       backing: .buffered,
       defer: false)
+    // very important!
+    window.isReleasedWhenClosed = false
     // create view controller with flutter engine
     let flutterViewController = FlutterViewController()
     // set window's view controllerr
