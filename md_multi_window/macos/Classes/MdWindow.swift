@@ -36,7 +36,6 @@ public class MdWindow: NSObject {
         x: style.trafficLightsOffsetX, y: style.trafficLightsOffsetY),
       trafficLightsSpacingFix: style.trafficLightsSpacingFix)
     window!.isReleasedWhenClosed = true
-    window?.makeKeyAndOrderFront(nil)
     let project = FlutterDartProject()
     let initRoute = route ?? ""
     if let r = params {
@@ -46,9 +45,6 @@ public class MdWindow: NSObject {
       project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute]
     }
     let flutterViewController = FlutterViewController(project: project)
-    let plugin = flutterViewController.registrar(forPlugin: "MdMultiWindowPlugin")
-    let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
-    MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
     window?.contentViewController = flutterViewController
     window?.title = style.title
     if style.titleShow {
@@ -62,6 +58,10 @@ public class MdWindow: NSObject {
     if style.center {
       window?.center()  // Center the window
     }
+    window?.makeKeyAndOrderFront(nil)
+    let plugin = flutterViewController.registrar(forPlugin: "MdMultiWindowPlugin")
+    let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
+    MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
     self.init(id: id, window: window, methodChannel: methodCh)
   }
 
