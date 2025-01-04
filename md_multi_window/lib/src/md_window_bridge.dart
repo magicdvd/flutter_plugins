@@ -14,11 +14,11 @@ mixin MdWindowBridge {
         params: params);
   }
 
-  Future<bool> brocastData(Map<String, String> params) async {
+  Future<bool> broadcastData(Map<String, String> params) async {
     return MdMultiWindowPlatform.instance.doAction(
         MdMultiWindow.currentWindow.id,
         MdMultiWindow.currentWindow.id,
-        'brocastData',
+        'broadcastData',
         params: params);
   }
 

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:md_multi_window/md_multi_window.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -31,6 +33,8 @@ abstract class MdMultiWindowPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion();
 
   Future<List<String>> getAllWindowIDs();
+
+  Future<Size?> getMainScreenSize();
 
   Future<void> createWindow(MdChannelArguments args);
 

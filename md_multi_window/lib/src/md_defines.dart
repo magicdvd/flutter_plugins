@@ -41,9 +41,15 @@ class StyleMaskMix {
 
 class WindowStyle {
   static const WindowStyle defaultStyle = WindowStyle();
+  static const double mainScreenHeight =
+      -4321; //magic number for main screen size (only use for native code, do not use it in flutter side)
+  static const double mainScreenWidth =
+      -1234; //magic number for main screen size (only use for native code, do not use it in flutter side)
   final Size size;
   final StyleMaskMix style;
   final Offset offset;
+  final Size minSize;
+  final Size maxSize;
   final bool center;
   final String title;
   final bool titleShow;
@@ -61,8 +67,10 @@ class WindowStyle {
       this.hideOnLaunch = false,
       this.lastWindowClosedShouldTerminateApp = false,
       this.trafficLightsOffset = const Offset(0, 0),
-      this.trafficLightsSpacingFix = 0});
-  // 自定义 toJson 方法
+      this.trafficLightsSpacingFix = 0,
+      this.minSize = const Size(0, 0),
+      this.maxSize = const Size(mainScreenWidth, mainScreenHeight)});
+
   Map<String, dynamic> toJson() {
     return {
       'h': size.height,
@@ -78,7 +86,11 @@ class WindowStyle {
       'l': lastWindowClosedShouldTerminateApp,
       'tb': trafficLightsSpacingFix,
       'tx': trafficLightsOffset.dx,
-      'ty': trafficLightsOffset.dy
+      'ty': trafficLightsOffset.dy,
+      'iw': minSize.width,
+      'ih': minSize.height,
+      'aw': maxSize.width,
+      'ah': maxSize.height,
     };
   }
 }

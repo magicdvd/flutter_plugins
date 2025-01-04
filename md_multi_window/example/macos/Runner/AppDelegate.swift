@@ -6,7 +6,9 @@ import md_multi_window
 class AppDelegate: FlutterAppDelegate {
 
   override func applicationDidFinishLaunching(_ notification: Notification) {
-    let rect = NSRect(x: 0, y: 0, width: 800, height: 600)
+    let mainScreenSize = MdMultiWindowPlugin.getMainScreen()
+    debugPrint(mainScreenSize)
+    let rect = NSRect(x: 0, y: 0, width: mainScreenSize.width, height: mainScreenSize.height)
     let window = MdFlutterWindow(
       contentRect: rect,
       styleMask: [.titled, .closable, .resizable, .miniaturizable],
@@ -19,7 +21,7 @@ class AppDelegate: FlutterAppDelegate {
     window.titleVisibility = .visible
     window.titlebarAppearsTransparent = false
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
-    window.hideOnLaunch = true
+    window.hideOnLaunch = false
     window.lastWindowClosedShouldTerminateApp = true
     window.setFrame(rect, display: true)
     window.center()
@@ -43,11 +45,11 @@ class AppDelegate: FlutterAppDelegate {
   override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool)
     -> Bool
   {
-    logMessage("reopen", sender.windows.count)
+    debugPrint("reopen", sender.windows.count)
     if !flag {
       for window in sender.windows {
         // 如果没有可见窗口，则重新显示窗口
-        logMessage("reopen \(window)")
+        debugPrint("reopen \(window)")
         window.makeKeyAndOrderFront(nil)
       }
     }

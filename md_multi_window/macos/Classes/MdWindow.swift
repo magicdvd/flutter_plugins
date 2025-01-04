@@ -27,7 +27,7 @@ public class MdWindow: NSObject {
   convenience init(
     id: String, windowStyle style: MdWindowStyle, route: String?, params: [String: String]?
   ) {
-    let rect = NSRect(x: style.x, y: style.y, width: style.width, height: style.height)
+    let rect = style.getFrame()
     var window: MdFlutterWindow?
     window = MdFlutterWindow(
       contentRect: rect,
@@ -47,20 +47,22 @@ public class MdWindow: NSObject {
       project.dartEntrypointArguments = ["md_multi_window", "\(id)", initRoute]
     }
     let flutterViewController = FlutterViewController(project: project)
-    window?.contentViewController = flutterViewController
-    window?.title = style.title
+    window!.contentViewController = flutterViewController
+    window!.title = style.title
+    window!.maxSize = style.getMaxSize()
+    window!.minSize = style.getMinSize()
     if style.titleShow {
-      window?.titleVisibility = .visible
+      window!.titleVisibility = .visible
     } else {
-      window?.titleVisibility = .hidden
+      window!.titleVisibility = .hidden
     }
-    window?.hideOnLaunch = style.hideOnLaunch
-    window?.titlebarAppearsTransparent = style.titlebarAppearsTransparent
-    window?.setFrame(rect, display: true)
+    window!.hideOnLaunch = style.hideOnLaunch
+    window!.titlebarAppearsTransparent = style.titlebarAppearsTransparent
+    window!.setFrame(rect, display: true)
     if style.center {
-      window?.center()  // Center the window
+      window!.center()  // Center the window
     }
-    window?.makeKeyAndOrderFront(nil)
+    window!.makeKeyAndOrderFront(nil)
     let plugin = flutterViewController.registrar(forPlugin: "MdMultiWindowPlugin")
     let methodCh = MdMultiWindowPlugin.attachChannel(with: plugin)
     MdMultiWindowPlugin.onWindowCreated?(flutterViewController)
@@ -68,7 +70,7 @@ public class MdWindow: NSObject {
   }
 
   deinit {
-    logMessage("macos:", "release window resource:\(id) \(String(describing: window))")
+    debugPrint("macos:", "release window resource:\(id) \(String(describing: window))")
     printRetainCount(of: window!)
     window?.delegate = nil
     if let flutterViewController = window?.contentViewController as? FlutterViewController {
@@ -104,6 +106,7 @@ public class MdWindow: NSObject {
         newFrame = NSRect(x: nx, y: ny, width: frame.width, height: frame.height)
       }
     }
+    debugPrint(newFrame)
     window?.setFrame(newFrame, display: false, animate: true)
   }
 
@@ -164,34 +167,18 @@ public class MdWindow: NSObject {
 
 extension MdWindow: NSWindowDelegate {
   internal func sendToFlutter(event: String) {
-    logMessage("macos:", "send to flutter", event)
-    //DispatchQueue.main.async {
+    debugPrint("macos:", "send to flutter", event)
     self.methodChannel.invokeMethod(
       event, arguments: self.id
     )
-    //}
   }
 
   public func windowWillClose(_ notification: Notification) {
     MdMultiWindowPlugin.shouldTerminateApp = window!.lastWindowClosedShouldTerminateApp
-    logMessage("will close", id)
     delegate?.willClose(windowID: id)
     preventCloseForceClose = false
     preventCloseProcessing = false
     sendToFlutter(event: "onClose")
-
-    // DispatchQueue.main.async { [weak window] in
-    //   guard let window = window else {
-    //     return
-    //   }
-    //   window.delegate = nil
-    //   if let flutterViewController = window.contentViewController as? FlutterViewController {
-    //     flutterViewController.engine.shutDownEngine()
-    //   }
-    //   window.contentViewController = nil
-    //   window.windowController = nil
-    //   window.unbindObserver()
-    // }
   }
 
   public func windowShouldClose(_ sender: NSWindow) -> Bool {

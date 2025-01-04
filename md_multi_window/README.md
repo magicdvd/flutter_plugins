@@ -160,8 +160,8 @@ class _MyAppState extends State<MyApp> with MdWindowBridge
     }
 
     //send data to all windows (include self)
-    void brocastDataToAll() {
-        brocastData({'send from (brocast)': MdMultiWindow.currentWindow.id});
+    void broadcastDataToAll() {
+        broadcastData({'send from (brocast)': MdMultiWindow.currentWindow.id});
     }
 
     //recieve data

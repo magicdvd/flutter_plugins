@@ -63,6 +63,11 @@ class MdMultiWindow {
     return _windowsMap.keys.toList();
   }
 
+  // get main screen size
+  static Future<Size?> getMainScreenSize() async {
+    return MdMultiWindowPlatform.instance.getMainScreenSize();
+  }
+
   // ensureInitialized
   // flutter main entry should be changed to main(List<String> args)
   // the args is the parameters for this function

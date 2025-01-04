@@ -1,14 +1,6 @@
 import Cocoa
 import FlutterMacOS
 
-public func logMessage(_ items: Any..., terminator: String = "\n") {
-  #if DEBUG
-    debugPrint(items, terminator: terminator)
-  #else
-    // 发布模式下不打印
-  #endif
-}
-
 public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   private static let instance = MdMultiWindowPlugin()
 
@@ -42,13 +34,13 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
     var mWindow: MdFlutterWindow
     if iwindow == nil {
       guard let app = NSApplication.shared.delegate as? FlutterAppDelegate else {
-        logMessage(
+        debugPrint(
           "macos:",
           "failed to find flutter main window, application delegate is not FlutterAppDelegate")
         return
       }
       guard let window = app.mainFlutterWindow as? MdFlutterWindow else {
-        logMessage("macos:", "failed to find flutter main window(make sure it is MdFlutterWindow)")
+        debugPrint("macos:", "failed to find flutter main window(make sure it is MdFlutterWindow)")
         return
       }
       mWindow = window
@@ -65,20 +57,19 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
   {
     let channel = FlutterMethodChannel(
       name: "magicd/md_multi_window/method", binaryMessenger: registrar.messenger)
-    // 只处理Flutter来的消息
     registrar.addMethodCallDelegate(instance, channel: channel)
     return channel
   }
 
   private func actionToNative(_ args: String, _ result: @escaping FlutterResult) {
-    logMessage("macos:", args)
+    debugPrint("macos:", args)
     guard let arguments = decodeJSON(from: args, to: MdCallArguments.self),
       let tid = arguments.targetWindowID,
       let window = MdWindowManager.instance.getWindow(id: tid),
       let params = arguments.extraParams,
       let action = params["name"]
     else {
-      logMessage("macos:", "failed not enough params", args)
+      debugPrint("macos:", "failed not enough params", args)
       result(false)
       return
     }
@@ -91,7 +82,7 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
       mp.removeValue(forKey: "name")
       mp["sender"] = arguments.windowID
       window.sendData(mp)
-    case "brocastData":
+    case "broadcastData":
       result(true)
       var mp = params
       mp.removeValue(forKey: "name")
@@ -151,11 +142,22 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
         }
         guard let xx = Double(x),
           let yy = Double(y),
-          let ww = Double(w),
-          let hh = Double(h)
+          var ww = Double(w),
+          var hh = Double(h)
         else {
           result(false)
           return
+        }
+        if hh == CGFloat(MdWindowStyle.gMainScreenSize.height)
+          || ww == CGFloat(MdWindowStyle.gMainScreenSize.width)
+        {
+          let size = getMainScreenSize()
+          ww =
+            (ww == CGFloat(MdWindowStyle.gMainScreenSize.width))
+            ? size.width : ww
+          hh =
+            (hh == CGFloat(MdWindowStyle.gMainScreenSize.height))
+            ? size.height : hh
         }
         if k == "false" {
           window.setFrame(
@@ -193,9 +195,13 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
         result(true)
       }
     default:
-      logMessage("macos:", action, "failed action not found")
+      debugPrint("macos:", action, "failed action not found")
       result(false)
     }
+  }
+
+  public static func getMainScreen() -> NSSize {
+    return getMainScreenSize()
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -224,6 +230,13 @@ public class MdMultiWindowPlugin: NSObject, FlutterPlugin {
       DispatchQueue.main.async {
         result(MdWindowManager.instance.getAllWindowIDs())
       }
+    case "mainScreenSize":
+      let mainScreenSize = getMainScreenSize(NSSize.zero)
+      let sizeMap: [String: Double] = [
+        "w": mainScreenSize.width,
+        "h": mainScreenSize.height,
+      ]
+      result(sizeMap)
     case "getPlatformVersion":
       result("macOS " + ProcessInfo.processInfo.operatingSystemVersionString)
     default:

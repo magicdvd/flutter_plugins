@@ -8,10 +8,12 @@ func printRetainCount(of object: AnyObject) {
 
 //MdWindowStyle 调用的窗口样式表述
 struct MdWindowStyle: Codable {
-    let gTitleStyle: [Int: NSWindow.StyleMask] = [
+    static let gTitleStyle: [Int: NSWindow.StyleMask] = [
         1: .titled, 2: .closable, 3: .resizable, 4: .miniaturizable, 5: .fullScreen,
         6: .borderless, 7: .fullSizeContentView,
     ]
+    // it is magic negative number for specified meaning
+    static let gMainScreenSize = NSSize(width: -1234, height: -4321)
     let width: CGFloat
     let height: CGFloat
     let x: CGFloat
@@ -26,6 +28,10 @@ struct MdWindowStyle: Codable {
     let trafficLightsOffsetX: CGFloat
     let trafficLightsOffsetY: CGFloat
     let trafficLightsSpacingFix: CGFloat
+    let minSizeW: CGFloat
+    let minSizeH: CGFloat
+    let maxSizeW: CGFloat
+    let maxSizeH: CGFloat
     enum CodingKeys: String, CodingKey {
         case width = "w"
         case height = "h"
@@ -41,13 +47,47 @@ struct MdWindowStyle: Codable {
         case trafficLightsOffsetX = "tx"
         case trafficLightsOffsetY = "ty"
         case trafficLightsSpacingFix = "tb"
+        case minSizeW = "iw"
+        case minSizeH = "ih"
+        case maxSizeW = "aw"
+        case maxSizeH = "ah"
     }
     func styleMask() -> NSWindow.StyleMask {
         var mask: NSWindow.StyleMask = []
         for number in styleMaskRaw {
-            mask.insert(gTitleStyle[number]!)
+            mask.insert(MdWindowStyle.gTitleStyle[number]!)
         }
         return mask
+    }
+    func getMinSize() -> NSSize {
+        var rw: CGFloat = minSizeW
+        var rh = minSizeH
+        if rw == MdWindowStyle.gMainScreenSize.width || rh == MdWindowStyle.gMainScreenSize.height {
+            let size = getMainScreenSize()
+            rw = (rw == MdWindowStyle.gMainScreenSize.width) ? size.width : rw
+            rh = (rh == MdWindowStyle.gMainScreenSize.height) ? size.height : rh
+        }
+        return NSSize(width: rw, height: rh)
+    }
+    func getMaxSize() -> NSSize {
+        var rw = maxSizeW
+        var rh = maxSizeH
+        if rw == MdWindowStyle.gMainScreenSize.width || rh == MdWindowStyle.gMainScreenSize.height {
+            let size = getMainScreenSize()
+            rw = (rw == MdWindowStyle.gMainScreenSize.width) ? size.width : rw
+            rh = (rh == MdWindowStyle.gMainScreenSize.height) ? size.height : rh
+        }
+        return NSSize(width: rw, height: rh)
+    }
+    func getFrame() -> NSRect {
+        var rw = width
+        var rh = height
+        if rw == MdWindowStyle.gMainScreenSize.width || rh == MdWindowStyle.gMainScreenSize.height {
+            let size = getMainScreenSize()
+            rw = (rw == MdWindowStyle.gMainScreenSize.width) ? size.width : rw
+            rh = (rh == MdWindowStyle.gMainScreenSize.height) ? size.height : rh
+        }
+        return NSRect(x: x, y: y, width: rw, height: rh)
     }
 }
 
@@ -67,10 +107,18 @@ struct MdCallArguments: Codable {
     }
 }
 
+func getMainScreenSize(_ defaultValue: NSSize = NSSize(width: 800, height: 600)) -> NSSize {
+    if let screen = NSScreen.main {
+        let screenSize = screen.frame.size
+        return screenSize
+    }
+    return defaultValue
+}
+
 // decode json
 func decodeJSON<T: Codable>(from jsonString: String, to type: T.Type) -> T? {
     guard let jsonData = jsonString.data(using: .utf8) else {
-        logMessage("macos:", "unable to convert string to data.")
+        debugPrint("macos:", "unable to convert string to data.")
         return nil
     }
     let decoder = JSONDecoder()
@@ -78,7 +126,7 @@ func decodeJSON<T: Codable>(from jsonString: String, to type: T.Type) -> T? {
         let decodedObject = try decoder.decode(T.self, from: jsonData)
         return decodedObject
     } catch {
-        logMessage("macos:", "decoding JSON: \(error)")
+        debugPrint("macos:", "decoding JSON: \(error)")
         return nil
     }
 }
@@ -95,12 +143,12 @@ func encodeToString<T: Codable>(_ object: T) -> String {
         if let jsonString = String(data: encodedData, encoding: .utf8) {
             return jsonString
         } else {
-            logMessage("Error: Unable to convert Data to String.")
+            debugPrint("Error: Unable to convert Data to String.")
             return "{}"
         }
     } catch {
         // 错误处理
-        logMessage("Error encoding object: \(error)")
+        debugPrint("Error encoding object: \(error)")
         return "{}"
     }
 }

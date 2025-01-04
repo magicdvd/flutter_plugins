@@ -24,6 +24,16 @@ class MdMultiWindowPlatformMacOS extends MdMultiWindowPlatform {
   }
 
   @override
+  Future<Size?> getMainScreenSize() async {
+    final map = await methodChannel
+        .invokeMethod<Map<dynamic, dynamic>>('mainScreenSize');
+    return Size(
+      map!['w'],
+      map['h']!,
+    );
+  }
+
+  @override
   Future<void> createWindow(MdChannelArguments args) async {
     await methodChannel.invokeMethod<String>('createWindow', jsonEncode(args));
   }

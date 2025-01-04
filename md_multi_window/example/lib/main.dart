@@ -114,8 +114,8 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
     sendData(id, {'send from': MdMultiWindow.currentWindow.id});
   }
 
-  void brocastDataToAll() {
-    brocastData({'send from (brocast)': MdMultiWindow.currentWindow.id});
+  void broadcastDataToAll() {
+    broadcastData({'send from (brocast)': MdMultiWindow.currentWindow.id});
   }
 
   @override
@@ -163,8 +163,13 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
     if (!mounted) return;
 
     setState(() {
-      MdMultiWindow.currentWindow
-          .setFrame(Offset.zero, Size(800, 600), keepCenter: true);
+      () async {
+        var size = await MdMultiWindow.getMainScreenSize();
+        debugPrint('screen size: $size');
+      }();
+      MdMultiWindow.currentWindow.setFrame(
+          Offset.zero, Size(WindowStyle.mainScreenWidth, 600),
+          keepCenter: false);
       _platformVersion = platformVersion;
     });
   }
@@ -221,7 +226,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
                 Center(
                   child: ElevatedButton(
                       onPressed: () {
-                        brocastDataToAll();
+                        broadcastDataToAll();
                       },
                       child: Text('brocast data to all')),
                 ),

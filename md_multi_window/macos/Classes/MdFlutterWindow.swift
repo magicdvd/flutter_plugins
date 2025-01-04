@@ -66,13 +66,9 @@ open class MdFlutterWindow: NSWindow {
     }
   }
 
-  // public func unbindObserver() {
-  //   NotificationCenter.default.removeObserver(self)
-  // }
-
   deinit {
     NotificationCenter.default.removeObserver(self)
-    logMessage("MdFlutterWindow released")
+    debugPrint("MdFlutterWindow released")
   }
 
   override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
@@ -116,9 +112,11 @@ open class MdFlutterWindow: NSWindow {
         var titleFrame = titleView!.frame
         titleFrame.origin.y += offset.y
         titleView!.frame = titleFrame
+      } else {
+        debugPrint("macos:", "titleBar title view is not found")
       }
     } else {
-      logMessage("macos:", "titleBar offset y is more than the height of button, do nothing")
+      debugPrint("macos:", "titleBar offset y is more than the height of button, do nothing")
     }
     let windowButtons = [close, miniaturize, zoom]
     var spaceBetween = miniaturize.frame.origin.x - close.frame.origin.x - close.frame.size.width
