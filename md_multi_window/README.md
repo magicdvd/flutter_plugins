@@ -2,9 +2,9 @@
 
 a mulit window support for macos
 
-Refer to the code of the three plugins, desktop_mulit_window
-window_manager
-bitsdojo_window
+Refer to the code of the three plugins, desktop_mulit_window [https://github.com/MixinNetwork/flutter-plugins/tree/main/packages/desktop_multi_window]
+window_manager [https://github.com/leanflutter/window_manager]
+bitsdojo_window [https://github.com/bitsdojo/bitsdojo_window]
 
 MacOS support only
 
@@ -170,4 +170,37 @@ class _MyAppState extends State<MyApp> with MdWindowBridge
         logMessage('recievedata $senderWindowID, $params');
     }
 
+```
+
+3. title bar button position (traffic lights)
+
+refer to [https://github.com/leanflutter/window_manager/issues/333]
+
+![titlebar](https://github.com/magicdvd/flutter_plugins/blob/main/md_multi_window/resources/titlebar.jpg)
+
+- swift, create MdFlutterWindow
+
+```dart
+// trafficLightsOffset: title content traffli lights (close button)view's bottomLeft point's offset (x: negative value = to left, positive = to right, y: negative value = down, positive = up)
+// trafficLightsSpacingFix: the fix is for the space between buttons, two spaces ([close]<->[min]<-> [fullscreen]), they are equal ( negative value: means reduce the space, positive value: increase the space)
+let window = MdFlutterWindow(
+      contentRect: NSRect(x:0,y:0,widht:100,height:100),
+      styleMask: [.titled, .closable, .resizable, .miniaturizable],
+      backing: .buffered,
+      defer: false, trafficLightsOffset: CGPoint(0,0),trafficLightsSpacingFix: -5)
+```
+
+```dart
+MdMultiWindow.createWindow(
+          windowID: nid,
+          style: WindowStyle(
+              style: StyleMaskMix.normal,
+              hideOnLaunch: true,
+              titleShow: true,
+              title: nid,
+              center: true,
+              size: Size(800, 600),
+              trafficLightsOffset: Offset(0,0),
+              trafficLightsSpacingFix: -5
+              ));
 ```
