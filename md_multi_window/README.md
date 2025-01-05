@@ -2,9 +2,11 @@
 
 a mulit window support for macos
 
-Refer to the code of the three plugins, desktop_mulit_window [https://github.com/MixinNetwork/flutter-plugins/tree/main/packages/desktop_multi_window]
-window_manager [https://github.com/leanflutter/window_manager]
-bitsdojo_window [https://github.com/bitsdojo/bitsdojo_window]
+Refer to the code of the three plugins
+
+- desktop_mulit_window [https://github.com/MixinNetwork/flutter-plugins/tree/main/packages/desktop_multi_window]
+- window_manager [https://github.com/leanflutter/window_manager]
+- bitsdojo_window [https://github.com/bitsdojo/bitsdojo_window]
 
 MacOS support only
 
@@ -44,12 +46,12 @@ override func applicationDidFinishLaunching(_ notification: Notification) {
     // set the frame size, keep it resize to size exactly
     window.setFrame(rect, display: true)
     window.center()
-    // register the flutter's plugins with this controller
-    RegisterGeneratedPlugins(registry: flutterViewController)
     // hide on launch ( main() MdMultiWindow.widgetsDidLoad((){}, showWindow: true))
     window.hideOnLaunch = true
     // whether to terminate the app while this window is the last closed window
     window.lastWindowClosedShouldTerminateApp = true
+    // register the flutter's plugins with this controller
+    RegisterGeneratedPlugins(registry: flutterViewController)
     // important!!! create channel with this view controller with this window
     MdMultiWindowPlugin.attachChannelWithMain(with: flutterViewController, window: window)
     // important!!! set callback after window creation, it is used to register flutter plugin with other created window
@@ -189,6 +191,8 @@ let window = MdFlutterWindow(
       backing: .buffered,
       defer: false, trafficLightsOffset: CGPoint(0,0),trafficLightsSpacingFix: -5)
 ```
+
+- dart, create new window
 
 ```dart
 MdMultiWindow.createWindow(
