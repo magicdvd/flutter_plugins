@@ -57,6 +57,7 @@ public class MdWindow: NSObject {
       window!.titleVisibility = .hidden
     }
     window!.hideOnLaunch = style.hideOnLaunch
+    window!.lastWindowClosedShouldTerminateApp = style.lastWindowClosedShouldTerminateApp
     window!.titlebarAppearsTransparent = style.titlebarAppearsTransparent
     window!.setFrame(rect, display: true)
     if style.center {

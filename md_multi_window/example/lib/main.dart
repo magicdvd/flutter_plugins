@@ -57,6 +57,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
             windowID: nid,
             style: WindowStyle(
                 style: StyleMaskMix.hidden,
+                lastWindowClosedShouldTerminateApp: true,
                 hideOnLaunch: false,
                 titleShow: true,
                 title: nid,
