@@ -72,7 +72,6 @@ public class MdWindow: NSObject {
 
   deinit {
     debugPrint("macos:", "release window resource:\(id) \(String(describing: window))")
-    printRetainCount(of: window!)
     window?.delegate = nil
     if let flutterViewController = window?.contentViewController as? FlutterViewController {
       flutterViewController.engine.shutDownEngine()

@@ -3,7 +3,7 @@ import Foundation
 
 func printRetainCount(of object: AnyObject) {
     let count = CFGetRetainCount(object)
-    print("Retain count of \(object): \(count)")
+    debugPrint("Retain count of \(object): \(count)")
 }
 
 //MdWindowStyle 调用的窗口样式表述

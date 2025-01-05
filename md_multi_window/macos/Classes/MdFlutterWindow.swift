@@ -68,7 +68,7 @@ open class MdFlutterWindow: NSWindow {
 
   deinit {
     NotificationCenter.default.removeObserver(self)
-    debugPrint("MdFlutterWindow released")
+    debugPrint("macos:", "MdFlutterWindow released")
   }
 
   override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
