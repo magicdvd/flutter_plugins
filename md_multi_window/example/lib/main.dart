@@ -8,7 +8,7 @@ void main(List<String> arguments) async {
   WidgetsFlutterBinding.ensureInitialized();
   await MdMultiWindow.ensureInitialized(arguments);
   runApp(const MyApp());
-  MdMultiWindow.widgetsDidLoad(() {}, showWindow: true);
+  //MdMultiWindow.widgetsDidLoad(() {}, showWindow: true);
 }
 
 class MyApp extends StatefulWidget {
@@ -165,12 +165,12 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
 
     setState(() {
       () async {
-        var size = await MdMultiWindow.getMainScreenSize();
-        debugPrint('screen size: $size');
+        // var size = await MdMultiWindow.getMainScreenSize();
+        // debugPrint('screen size: $size');
       }();
-      MdMultiWindow.currentWindow.setFrame(
-          Offset.zero, Size(WindowStyle.mainScreenWidth, 600),
-          keepCenter: false);
+      // MdMultiWindow.currentWindow.setFrame(
+      //     Offset.zero, Size(WindowStyle.mainScreenWidth, 600),
+      //     keepCenter: false);
       _platformVersion = platformVersion;
     });
   }
