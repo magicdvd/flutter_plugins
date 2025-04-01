@@ -10,3 +10,8 @@ void MdMultiWindowPluginCApiRegisterWithRegistrar(
       flutter::PluginRegistrarManager::GetInstance()
           ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
 }
+
+void MdMultiWindowPluginCApiAttachChannelWithMain(
+    flutter::PluginRegistry *registry) {
+  md_multi_window::MdMultiWindowPlugin::AttachChannelWithMain(registry);
+}

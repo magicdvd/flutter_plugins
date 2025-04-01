@@ -2,6 +2,7 @@
 #define FLUTTER_PLUGIN_MD_MULTI_WINDOW_PLUGIN_H_
 
 #include <flutter/method_channel.h>
+#include <flutter/plugin_registry.h>
 #include <flutter/plugin_registrar_windows.h>
 
 #include <memory>
@@ -11,7 +12,8 @@ namespace md_multi_window {
 class MdMultiWindowPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
-
+  static void AttachChannel(flutter::PluginRegistrarWindows *registrar);
+  static void AttachChannelWithMain(flutter::PluginRegistry *registry);
   MdMultiWindowPlugin();
 
   virtual ~MdMultiWindowPlugin();

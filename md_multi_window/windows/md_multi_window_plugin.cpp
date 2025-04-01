@@ -9,7 +9,6 @@
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
 #include <flutter/standard_method_codec.h>
-
 #include <memory>
 #include <sstream>
 
@@ -18,19 +17,43 @@ namespace md_multi_window {
 // static
 void MdMultiWindowPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar) {
-  auto channel =
-      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-          registrar->messenger(), "magicd/md_multi_window/method",
-          &flutter::StandardMethodCodec::GetInstance());
+    // auto channel =
+    //     std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+    //         registrar->messenger(), "magicd/md_multi_window/method",
+    //         &flutter::StandardMethodCodec::GetInstance());
 
-  auto plugin = std::make_unique<MdMultiWindowPlugin>();
+    // auto plugin = std::make_unique<MdMultiWindowPlugin>();
 
-  channel->SetMethodCallHandler(
-      [plugin_pointer = plugin.get()](const auto &call, auto result) {
-        plugin_pointer->HandleMethodCall(call, std::move(result));
-      });
+    // channel->SetMethodCallHandler(
+    //     [plugin_pointer = plugin.get()](const auto &call, auto result) {
+    //       plugin_pointer->HandleMethodCall(call, std::move(result));
+    //     });
 
-  registrar->AddPlugin(std::move(plugin));
+    // registrar->AddPlugin(std::move(plugin));
+}
+
+void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registrar) {
+    auto channel =
+        std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+            registrar->messenger(), "magicd/md_multi_window/method",
+            &flutter::StandardMethodCodec::GetInstance());
+
+    auto plugin = std::make_unique<MdMultiWindowPlugin>();
+
+    channel->SetMethodCallHandler(
+        [plugin_pointer = plugin.get()](const auto &call, auto result) {
+          plugin_pointer->HandleMethodCall(call, std::move(result));
+        });
+
+    registrar->AddPlugin(std::move(plugin));
+}
+
+void MdMultiWindowPlugin::AttachChannelWithMain(
+    flutter::PluginRegistry *registry) {
+    auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
+    auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
+      ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
+    MdMultiWindowPlugin::AttachChannel(window_registrar);
 }
 
 MdMultiWindowPlugin::MdMultiWindowPlugin() {}
