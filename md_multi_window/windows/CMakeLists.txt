@@ -20,6 +20,10 @@ set(PLUGIN_NAME "md_multi_window_plugin")
 list(APPEND PLUGIN_SOURCES
   "md_multi_window_plugin.cpp"
   "md_multi_window_plugin.h"
+  "md_window_manager.cc"
+  "md_window_manager.h"
+  "md_window.cc"
+  "md_window.h"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
