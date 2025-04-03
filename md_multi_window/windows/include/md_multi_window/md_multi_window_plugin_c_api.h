@@ -18,7 +18,11 @@ FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar);
 
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiAttachChannelWithMain(
-    flutter::PluginRegistry *registry);
+    flutter::PluginRegistry *registry, const char* main_window_id = "md_mulit_window_main");
+
+// flutter_view_controller: pointer to the flutter::FlutterViewController
+typedef void (*WindowCreatedCallback)(void *flutter_view_controller);
+FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiSetWindowCreatedCallback(WindowCreatedCallback callback);
 
 #if defined(__cplusplus)
 }  // extern "C"

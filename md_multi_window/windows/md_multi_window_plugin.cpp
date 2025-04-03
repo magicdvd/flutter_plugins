@@ -12,6 +12,8 @@
 #include <memory>
 #include <sstream>
 
+#include "md_window_manager.h"
+
 namespace md_multi_window {
 
 // static
@@ -49,10 +51,14 @@ void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registr
 }
 
 void MdMultiWindowPlugin::AttachChannelWithMain(
-    flutter::PluginRegistry *registry) {
+    flutter::PluginRegistry *registry, const char* main_window_id) {
+    
     auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
     auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
       ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
+    auto hwnd = FlutterDesktopViewGetHWND(FlutterDesktopPluginRegistrarGetView(registrar));
+    std::string id = main_window_id;
+    MdWindowManager::Instance()->AddWindowAndNotifyAll(id, GetAncestor(hwnd, GA_ROOT));
     MdMultiWindowPlugin::AttachChannel(window_registrar);
 }
 
@@ -74,6 +80,9 @@ void MdMultiWindowPlugin::HandleMethodCall(
       version_stream << "7";
     }
     result->Success(flutter::EncodableValue(version_stream.str()));
+  } else if (method_call.method_name() == "getAllWindowIDs") {
+    result->Success(MdWindowManager::Instance()->GetAllWindowIDs());
+    return;
   } else {
     result->NotImplemented();
   }

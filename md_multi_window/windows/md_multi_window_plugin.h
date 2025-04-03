@@ -13,7 +13,7 @@ class MdMultiWindowPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
   static void AttachChannel(flutter::PluginRegistrarWindows *registrar);
-  static void AttachChannelWithMain(flutter::PluginRegistry *registry);
+  static void AttachChannelWithMain(flutter::PluginRegistry *registry, const char* main_window_id);
   MdMultiWindowPlugin();
 
   virtual ~MdMultiWindowPlugin();

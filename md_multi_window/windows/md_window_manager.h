@@ -17,7 +17,9 @@ class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, pu
   MdWindowManager();
 
   std::string Create(std::string id, std::string args);
-  // void AddWindowAndNotifyAll(std::string id, HWND window_handle);
+  void AddWindowAndNotifyAll(std::string id, HWND window_handle);
+
+  flutter::EncodableList GetAllWindowIDs();
 
   // flutter::EncodableList GetAllWindowIDs();
   void OnWindowClose(std::string id) override;

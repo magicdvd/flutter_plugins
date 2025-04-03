@@ -8,8 +8,8 @@
 namespace md_multi_window {
 
 // static
-MdWindowManager *MdWindowManager::Instance() {
-  static auto manager = std::make_shared<MdWindowManager>();
+MdWindowManager* MdWindowManager::Instance() {
+  static std::shared_ptr<MdWindowManager> manager = std::make_shared<MdWindowManager>();
   return manager.get();
 }
 
@@ -31,83 +31,25 @@ std::string MdWindowManager::Create(std::string id, std::string args) {
   return id;
 }
 
+void MdWindowManager::AddWindowAndNotifyAll(std::string id, HWND window_handle) {
+  auto window = std::make_unique<MdWindow>(id, window_handle, shared_from_this());
+  windows_[id] = std::move(window);
+}
 
-// void MultiWindowManager::AttachFlutterMainWindow(
-//     HWND main_window_handle,
-//     std::unique_ptr<WindowChannel> window_channel) {
-//   if (windows_.count(0) != 0) {
-//     std::cout << "Error: main window already exists" << std::endl;
-//     return;
-//   }
-//   window_channel->SetMethodCallHandler(
-//       [this](int64_t from_window_id,
-//              int64_t target_window_id,
-//              const std::string &call,
-//              flutter::EncodableValue *arguments,
-//              std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
-//         HandleWindowChannelCall(from_window_id, target_window_id, call, arguments, std::move(result));
-//       });
-//   windows_[0] = std::make_unique<FlutterMainWindow>(main_window_handle, std::move(window_channel));
-// // }
+flutter::EncodableList MdWindowManager::GetAllWindowIDs() {
+  flutter::EncodableList resList = flutter::EncodableList();
+  for (const auto &window : windows_) {
+      resList.push_back(flutter::EncodableValue(window.first));
+  }
+  return resList;
+}
 
-// void MultiWindowManager::Show(int64_t id) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->Show();
-//   }
-// }
+void MdWindowManager::OnWindowClose(std::string id) {
+}
 
-// void MultiWindowManager::Hide(int64_t id) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->Hide();
-//   }
-// }
-
-// void MultiWindowManager::Close(int64_t id) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->Close();
-//   }
-// }
-
-// void MultiWindowManager::SetFrame(int64_t id, double x, double y, double width, double height) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->SetBounds(x, y, width, height);
-//   }
-// }
-
-// void MultiWindowManager::SetTitle(int64_t id, const std::string &title) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->SetTitle(title);
-//   }
-// }
-
-// void MultiWindowManager::Center(int64_t id) {
-//   auto window = windows_.find(id);
-//   if (window != windows_.end()) {
-//     window->second->Center();
-//   }
-// }
-
-// flutter::EncodableList MultiWindowManager::GetAllWindowIDs() {
-//   flutter::EncodableList resList = flutter::EncodableList();
-//   for (auto &window : windows_) {
-//     if (window.first != 0) {
-//       resList.push_back(flutter::EncodableValue(window.first));
-//     }
-//   }
-//   return resList;
-// }
-
-    void MdWindowManager::OnWindowClose(std::string id) {
-    }
-
-    void MdWindowManager::OnWindowDestroy(std::string id) {
-        windows_.erase(id);
-    }
+void MdWindowManager::OnWindowDestroy(std::string id) {
+    windows_.erase(id);
+}
 
 // void MultiWindowManager::HandleWindowChannelCall(
 //     int64_t from_window_id,

@@ -4,10 +4,12 @@
 #include <windows.h>
 
 #include <flutter/flutter_view_controller.h>
-
+#include "include/md_multi_window/md_multi_window_plugin_c_api.h"
 #include <cstdint>
 #include <memory>
 #include <string>
+
+#include "flutter/encodable_value.h"
 
 namespace md_multi_window {
 
@@ -23,6 +25,8 @@ class MdWindowCallback {
 class MdWindow {
 
  public:
+
+  static WindowCreatedCallback window_callback;
 
   MdWindow(std::string id, std::string args, const std::shared_ptr<MdWindowCallback> &callback);
   MdWindow(std::string id, HWND handle, const std::shared_ptr<MdWindowCallback> &callback);

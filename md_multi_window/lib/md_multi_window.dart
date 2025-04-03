@@ -99,22 +99,20 @@ class MdMultiWindow {
     if (_intialized) {
       throw Exception('duplicate MdMultiWindow.ensureInitialized called');
     }
-    _current = MdWindow('main');
-    // temp method channel to ensure initialized
-    // final ids = await MdMultiWindowPlatform.instance.getAllWindowIDs();
-    // for (String id in ids) {
-    //   final window = MdWindow(id);
-    //   if (id == windowID) {
-    //     if (_current != null) {
-    //       throw ArgumentError('duplicate windowID:$windowID');
-    //     }
-    //     _current = window;
-    //   }
-    //   _windowsMap[id] = window;
-    // }
-    // if (_current == null) {
-    //   throw ArgumentError('current windowID:$windowID has not been created');
-    // }
+    final ids = await MdMultiWindowPlatform.instance.getAllWindowIDs();
+    for (String id in ids) {
+      final window = MdWindow(id);
+      if (id == windowID) {
+        if (_current != null) {
+          throw ArgumentError('duplicate windowID:$windowID');
+        }
+        _current = window;
+      }
+      _windowsMap[id] = window;
+    }
+    if (_current == null) {
+      throw ArgumentError('current windowID:$windowID has not been created');
+    }
     _intialized = true;
     return (_current!, initRoute, arguments);
   }

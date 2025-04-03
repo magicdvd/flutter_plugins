@@ -8,12 +8,12 @@
 #include <iostream>
 #include <utility>
 
-#include "include/md_multi_window/md_multi_window_plugin_c_api.h"
+
 #include "md_multi_window_plugin.h"
 
 namespace md_multi_window {
 
-// WindowCreatedCallback _g_window_created_callback = nullptr;
+WindowCreatedCallback MdWindow::window_callback = nullptr; 
 
 TCHAR kMdWindowClassName[] = _T("MdMultiWindow");
 

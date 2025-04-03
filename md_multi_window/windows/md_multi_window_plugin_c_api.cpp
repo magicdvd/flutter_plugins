@@ -3,6 +3,7 @@
 #include <flutter/plugin_registrar_windows.h>
 
 #include "md_multi_window_plugin.h"
+#include "md_window.h"
 
 void MdMultiWindowPluginCApiRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar) {
@@ -12,6 +13,11 @@ void MdMultiWindowPluginCApiRegisterWithRegistrar(
 }
 
 void MdMultiWindowPluginCApiAttachChannelWithMain(
-    flutter::PluginRegistry *registry) {
-  md_multi_window::MdMultiWindowPlugin::AttachChannelWithMain(registry);
+    flutter::PluginRegistry *registry, const char* main_window_id) {
+  md_multi_window::MdMultiWindowPlugin::AttachChannelWithMain(registry,main_window_id);
+}
+
+typedef void (*WindowCreatedCallback)(void *flutter_view_controller);
+void MdMultiWindowPluginCApiSetWindowCreatedCallback(WindowCreatedCallback callback){
+  md_multi_window::MdWindow::window_callback = callback;
 }
