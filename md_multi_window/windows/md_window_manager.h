@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <map>
+#include "include/md_multi_window/md_multi_window_plugin_c_api.h"
 #include "md_window.h"
 
 
@@ -12,20 +13,23 @@ namespace md_multi_window {
 class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, public MdWindowCallback{
 
  public:
+  static MdMultiWindowPluginCreateWindowCallback g_create_window_callback;
+  // singleton
   static MdWindowManager *Instance();
-
   MdWindowManager();
 
-  std::string Create(std::string id, std::string args);
-  void AddWindowAndNotifyAll(std::string id, HWND window_handle);
+  // create new window
+  std::string CreateWindowAndRegister(std::string id, std::string args);
+
+  std::string RegisterMainWindow(std::string id, std::shared_ptr<FlutterWindow> window);
 
   flutter::EncodableList GetAllWindowIDs();
 
-  // flutter::EncodableList GetAllWindowIDs();
+  // callback used
   void OnWindowClose(std::string id) override;
   void OnWindowDestroy(std::string id) override;
  private:
-
+  void AddWindowAndNotifyAll(std::string id, std::unique_ptr<MdWindow> window);
   std::map<std::string, std::unique_ptr<MdWindow>> windows_;
 
 };

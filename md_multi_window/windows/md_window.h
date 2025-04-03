@@ -25,37 +25,16 @@ class MdWindowCallback {
 class MdWindow {
 
  public:
-
-  static WindowCreatedCallback window_callback;
-
-  MdWindow(std::string id, std::string args, const std::shared_ptr<MdWindowCallback> &callback);
-  MdWindow(std::string id, HWND handle, const std::shared_ptr<MdWindowCallback> &callback);
+  MdWindow(std::string id, std::shared_ptr<FlutterWindow>, const std::shared_ptr<MdWindowCallback> &callback);
   ~MdWindow();
 
- protected:
-
-  HWND GetWindowHandle() { return window_handle_; };
-
  private:
+
+  std::shared_ptr<FlutterWindow> window_;
 
   std::weak_ptr<MdWindowCallback> callback_;
 
   std::string id_;
-
-  HWND window_handle_;
-
-  // The Flutter instance hosted by this window.
-  std::unique_ptr<flutter::FlutterViewController> flutter_controller_;
-
-  double scale_factor_;
-
-  bool destroyed_ = false;
-
-  //static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-  //static MdWindow *GetThisFromHandle(HWND window) noexcept;
-
-  //LRESULT MessageHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 
   void Destroy();
 };

@@ -4,8 +4,9 @@
 #include <string>
 #include "md_window.h"
 
-
 namespace md_multi_window {
+
+MdMultiWindowPluginCreateWindowCallback MdWindowManager::g_create_window_callback = nullptr;
 
 // static
 MdWindowManager* MdWindowManager::Instance() {
@@ -16,7 +17,7 @@ MdWindowManager* MdWindowManager::Instance() {
 MdWindowManager::MdWindowManager() : windows_() {
 }
 
-std::string MdWindowManager::Create(std::string id, std::string args) {
+std::string MdWindowManager::CreateWindowAndRegister(std::string id, std::string args) {
  
   //auto window = std::make_unique<MdWindow>(id, std::move(args), shared_from_this());
 // //   auto channel = window->GetWindowChannel();
@@ -31,8 +32,13 @@ std::string MdWindowManager::Create(std::string id, std::string args) {
   return id;
 }
 
-void MdWindowManager::AddWindowAndNotifyAll(std::string id, HWND window_handle) {
-  auto window = std::make_unique<MdWindow>(id, window_handle, shared_from_this());
+std::string MdWindowManager::RegisterMainWindow(std::string id, std::shared_ptr<FlutterWindow> fwin) {
+  auto window = std::make_unique<MdWindow>(id, fwin, shared_from_this());
+  AddWindowAndNotifyAll(id, std::move(window));
+  return id;
+}
+
+void MdWindowManager::AddWindowAndNotifyAll(std::string id, std::unique_ptr<MdWindow> window) {
   windows_[id] = std::move(window);
 }
 

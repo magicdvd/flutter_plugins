@@ -13,28 +13,13 @@
 #include <sstream>
 
 #include "md_window_manager.h"
+#include "md_call_arguments.h"
 
 namespace md_multi_window {
 
 // static
 void MdMultiWindowPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar) {
-    // auto channel =
-    //     std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-    //         registrar->messenger(), "magicd/md_multi_window/method",
-    //         &flutter::StandardMethodCodec::GetInstance());
-
-    // auto plugin = std::make_unique<MdMultiWindowPlugin>();
-
-    // channel->SetMethodCallHandler(
-    //     [plugin_pointer = plugin.get()](const auto &call, auto result) {
-    //       plugin_pointer->HandleMethodCall(call, std::move(result));
-    //     });
-
-    // registrar->AddPlugin(std::move(plugin));
-}
-
-void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registrar) {
     auto channel =
         std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
             registrar->messenger(), "magicd/md_multi_window/method",
@@ -50,16 +35,26 @@ void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registr
     registrar->AddPlugin(std::move(plugin));
 }
 
-void MdMultiWindowPlugin::AttachChannelWithMain(
-    flutter::PluginRegistry *registry, const char* main_window_id) {
-    
-    auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
-    auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
-      ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
-    auto hwnd = FlutterDesktopViewGetHWND(FlutterDesktopPluginRegistrarGetView(registrar));
+// void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registrar) {
+//     auto channel =
+//         std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+//             registrar->messenger(), "magicd/md_multi_window/method",
+//             &flutter::StandardMethodCodec::GetInstance());
+
+//     auto plugin = std::make_unique<MdMultiWindowPlugin>();
+
+//     channel->SetMethodCallHandler(
+//         [plugin_pointer = plugin.get()](const auto &call, auto result) {
+//           plugin_pointer->HandleMethodCall(call, std::move(result));
+//         });
+
+//     registrar->AddPlugin(std::move(plugin));
+// }
+
+void MdMultiWindowPlugin::RegisterMainWindow(
+    std::shared_ptr<FlutterWindow> window, const char* main_window_id) {
     std::string id = main_window_id;
-    MdWindowManager::Instance()->AddWindowAndNotifyAll(id, GetAncestor(hwnd, GA_ROOT));
-    MdMultiWindowPlugin::AttachChannel(window_registrar);
+    MdWindowManager::Instance()->RegisterMainWindow(id, std::move(window));
 }
 
 MdMultiWindowPlugin::MdMultiWindowPlugin() {}
@@ -82,10 +77,37 @@ void MdMultiWindowPlugin::HandleMethodCall(
     result->Success(flutter::EncodableValue(version_stream.str()));
   } else if (method_call.method_name() == "getAllWindowIDs") {
     result->Success(MdWindowManager::Instance()->GetAllWindowIDs());
-    return;
+  } else if (method_call.method_name() == "createWindow"){
+    if (auto str_value = std::get_if<std::string>(method_call.arguments())) {
+      std::cout << "String value: " << *str_value << std::endl;
+      auto data = ParseMdCallArguments(*str_value);
+      if (data != std::nullopt) {
+        MdCallArguments args = data.value();
+        std::cout << "has value, which is " << args.windowID << std::endl;
+        result->Success(args.windowID);
+      } else {
+        std::cout << "no value" << std::endl;
+      }
+    } else {
+      std::cout << "EncodableValue is not a string!" << std::endl;
+      result->Success("");
+    }
+  } else if (method_call.method_name() == "action"){
+    result->NotImplemented();
+  } else if (method_call.method_name() == "mainScreenSize"){
+    result->NotImplemented();
   } else {
     result->NotImplemented();
   }
 }
+
+void MdMultiWindowPlugin::ActionToNative(std::string value, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+  // if (auto str_value = std::get_if<std::string>(&value)) {
+  //   std::cout << "String value: " << *str_value << std::endl;
+  // } else {
+  //   std::cout << "EncodableValue is not a string!" << std::endl;
+  // }
+}
+
 
 }  // namespace md_multi_window
