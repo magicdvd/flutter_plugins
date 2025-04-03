@@ -4,7 +4,6 @@
 #include <string>
 #include "md_window.h"
 
-
 namespace md_multi_window {
 
 // static
@@ -31,8 +30,13 @@ std::string MdWindowManager::Create(std::string id, std::string args) {
   return id;
 }
 
-void MdWindowManager::AddWindowAndNotifyAll(std::string id, HWND window_handle) {
+std::string MdWindowManager::CreateWithMain(std::string id, HWND window_handle) {
   auto window = std::make_unique<MdWindow>(id, window_handle, shared_from_this());
+  AddWindowAndNotifyAll(id, std::move(window));
+  return id;
+}
+
+void MdWindowManager::AddWindowAndNotifyAll(std::string id, std::unique_ptr<MdWindow> window) {
   windows_[id] = std::move(window);
 }
 

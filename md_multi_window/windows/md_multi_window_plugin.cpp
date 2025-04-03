@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "md_window_manager.h"
+#include "md_call_arguments.h"
 
 namespace md_multi_window {
 
@@ -58,7 +59,7 @@ void MdMultiWindowPlugin::AttachChannelWithMain(
       ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
     auto hwnd = FlutterDesktopViewGetHWND(FlutterDesktopPluginRegistrarGetView(registrar));
     std::string id = main_window_id;
-    MdWindowManager::Instance()->AddWindowAndNotifyAll(id, GetAncestor(hwnd, GA_ROOT));
+    MdWindowManager::Instance()->CreateWithMain(id, GetAncestor(hwnd, GA_ROOT));
     MdMultiWindowPlugin::AttachChannel(window_registrar);
 }
 
@@ -82,10 +83,37 @@ void MdMultiWindowPlugin::HandleMethodCall(
     result->Success(flutter::EncodableValue(version_stream.str()));
   } else if (method_call.method_name() == "getAllWindowIDs") {
     result->Success(MdWindowManager::Instance()->GetAllWindowIDs());
-    return;
+  } else if (method_call.method_name() == "createWindow"){
+    if (auto str_value = std::get_if<std::string>(method_call.arguments())) {
+      std::cout << "String value: " << *str_value << std::endl;
+      auto data = ParseMdCallArguments(*str_value);
+      if (data != std::nullopt) {
+        MdCallArguments args = data.value();
+        std::cout << "has value, which is " << args.windowID << std::endl;
+        result->Success(args.windowID);
+      } else {
+        std::cout << "no value" << std::endl;
+      }
+    } else {
+      std::cout << "EncodableValue is not a string!" << std::endl;
+      result->Success("");
+    }
+  } else if (method_call.method_name() == "action"){
+    result->NotImplemented();
+  } else if (method_call.method_name() == "mainScreenSize"){
+    result->NotImplemented();
   } else {
     result->NotImplemented();
   }
 }
+
+void MdMultiWindowPlugin::ActionToNative(std::string value, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+  // if (auto str_value = std::get_if<std::string>(&value)) {
+  //   std::cout << "String value: " << *str_value << std::endl;
+  // } else {
+  //   std::cout << "EncodableValue is not a string!" << std::endl;
+  // }
+}
+
 
 }  // namespace md_multi_window

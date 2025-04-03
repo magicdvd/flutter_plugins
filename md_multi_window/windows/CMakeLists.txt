@@ -24,6 +24,9 @@ list(APPEND PLUGIN_SOURCES
   "md_window_manager.h"
   "md_window.cc"
   "md_window.h"
+  "md_call_arguments.cc"
+  "md_call_arguments.h"
+  "include/md_multi_window/json.hpp"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
