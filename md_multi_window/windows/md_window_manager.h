@@ -21,7 +21,12 @@ class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, pu
   // create new window
   std::string CreateWindowAndRegister(const std::string& args);
 
-  std::string RegisterMainWindow(const std::string& id, std::shared_ptr<FlutterWindow> window);
+  std::string RegisterWindow(
+    const std::string& id, 
+    std::shared_ptr<FlutterWindow> window,
+    HWND window_handle,
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
+  );
 
   flutter::EncodableList GetAllWindowIDs();
 

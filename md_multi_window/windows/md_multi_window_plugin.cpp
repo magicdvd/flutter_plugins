@@ -19,42 +19,41 @@ namespace md_multi_window {
 
 // static
 void MdMultiWindowPlugin::RegisterWithRegistrar(
-    flutter::PluginRegistrarWindows *registrar) {
+  flutter::PluginRegistrarWindows *registrar) {
+  // auto channel =
+  //     std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+  //         registrar->messenger(), "magicd/md_multi_window/method",
+  //         &flutter::StandardMethodCodec::GetInstance());
+
+  // auto plugin = std::make_unique<MdMultiWindowPlugin>();
+
+  // channel->SetMethodCallHandler(
+  //     [plugin_pointer = plugin.get()](const auto &call, auto result) {
+  //       plugin_pointer->HandleMethodCall(call, std::move(result));
+  //     });
+
+  // registrar->AddPlugin(std::move(plugin));
+}
+
+void MdMultiWindowPlugin::RegisterWindow(
+    const std::string& id, 
+    HWND handle, 
+    std::shared_ptr<FlutterWindow> fw, 
+    flutter::PluginRegistry *registry) {
+    auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
+    auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
+      ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
     auto channel =
-        std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-            registrar->messenger(), "magicd/md_multi_window/method",
-            &flutter::StandardMethodCodec::GetInstance());
-
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+        window_registrar->messenger(), "magicd/md_multi_window/method",
+          &flutter::StandardMethodCodec::GetInstance());
     auto plugin = std::make_unique<MdMultiWindowPlugin>();
-
     channel->SetMethodCallHandler(
         [plugin_pointer = plugin.get()](const auto &call, auto result) {
           plugin_pointer->HandleMethodCall(call, std::move(result));
         });
-
-    registrar->AddPlugin(std::move(plugin));
-}
-
-// void MdMultiWindowPlugin::AttachChannel(flutter::PluginRegistrarWindows *registrar) {
-//     auto channel =
-//         std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-//             registrar->messenger(), "magicd/md_multi_window/method",
-//             &flutter::StandardMethodCodec::GetInstance());
-
-//     auto plugin = std::make_unique<MdMultiWindowPlugin>();
-
-//     channel->SetMethodCallHandler(
-//         [plugin_pointer = plugin.get()](const auto &call, auto result) {
-//           plugin_pointer->HandleMethodCall(call, std::move(result));
-//         });
-
-//     registrar->AddPlugin(std::move(plugin));
-// }
-
-void MdMultiWindowPlugin::RegisterMainWindow(
-    std::shared_ptr<FlutterWindow> window, const char* main_window_id) {
-    std::string id = main_window_id;
-    MdWindowManager::Instance()->RegisterMainWindow(id, std::move(window));
+    window_registrar->AddPlugin(std::move(plugin));
+    MdWindowManager::Instance()->RegisterWindow(id, std::move(fw), handle, std::move(channel));
 }
 
 MdMultiWindowPlugin::MdMultiWindowPlugin() {}
@@ -165,6 +164,5 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
     result->Success(false);
     return;
 }
-
 
 }  // namespace md_multi_window

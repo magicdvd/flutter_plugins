@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <windows.h>
 
 #ifdef FLUTTER_PLUGIN_IMPL
 #define FLUTTER_PLUGIN_EXPORT __declspec(dllexport)
@@ -32,12 +33,17 @@ class FlutterWindow {
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_
 
-FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegisterMain(
-    std::shared_ptr<FlutterWindow> window, const char* main_window_id = "md_mulit_window_main");
+FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
+    const std::string& id,
+    HWND window_handle_,
+    flutter::PluginRegistry *registry,
+    std::shared_ptr<FlutterWindow> window
+);
 
 typedef std::shared_ptr<FlutterWindow> (
     *MdMultiWindowPluginCreateWindowCallback)(
-    std::vector<std::string> command_line_arguments);
+    std::vector<std::string> command_line_arguments, const std::string& id, const std::wstring& title, unsigned int x, unsigned int y,
+    unsigned int width, unsigned int height);
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiSetCreateWindowCallback(
     MdMultiWindowPluginCreateWindowCallback callback);
 

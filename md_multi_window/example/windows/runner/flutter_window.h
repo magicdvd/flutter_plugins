@@ -9,12 +9,12 @@
 #include "win32_window.h"
 
 // A window that does nothing but host a Flutter view.
-class FlutterWindow : public Win32Window {
+class FlutterWindow : public std::enable_shared_from_this<FlutterWindow>, public Win32Window {
  public:
   // Creates a new FlutterWindow hosting a Flutter view running |project|.
   explicit FlutterWindow(const flutter::DartProject& project);
   virtual ~FlutterWindow();
-
+  void SetWindowID(const std::string& id = "md_mulit_window_main");
  protected:
   // Win32Window:
   bool OnCreate() override;
@@ -25,6 +25,7 @@ class FlutterWindow : public Win32Window {
  private:
   // The project to run.
   flutter::DartProject project_;
+  std::string id_;
 
   // The Flutter instance hosted by this window.
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;

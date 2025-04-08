@@ -3,11 +3,16 @@
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+#include "md_multi_window/md_multi_window_plugin_c_api.h"
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
 
 FlutterWindow::~FlutterWindow() {}
+
+void FlutterWindow::SetWindowID(const std::string& id) {
+  id_ = id;
+}
 
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
@@ -26,6 +31,8 @@ bool FlutterWindow::OnCreate() {
   }
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
+
+  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->view()->GetNativeWindow(),flutter_controller_->engine(), shared_from_this());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();

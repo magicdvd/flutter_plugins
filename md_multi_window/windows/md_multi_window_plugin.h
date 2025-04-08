@@ -13,7 +13,11 @@ namespace md_multi_window {
 class MdMultiWindowPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
-  static void RegisterMainWindow(std::shared_ptr<FlutterWindow> window, const char* main_window_id);
+  static void RegisterWindow(
+    const std::string& id, 
+    HWND handle, 
+    std::shared_ptr<FlutterWindow> fw, 
+    flutter::PluginRegistry *registry);
   MdMultiWindowPlugin();
 
   virtual ~MdMultiWindowPlugin();

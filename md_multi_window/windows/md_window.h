@@ -8,8 +8,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-
 #include "flutter/encodable_value.h"
+#include "flutter/method_channel.h"
 
 namespace md_multi_window {
 
@@ -17,15 +17,19 @@ class MdWindowCallback {
 
   public:
     virtual void OnWindowClose(const std::string& id) = 0;
-  
     virtual void OnWindowDestroy(const std::string& id) = 0;
-  
   };
 
 class MdWindow {
 
  public:
-  MdWindow(const std::string &id, std::shared_ptr<FlutterWindow>, const std::shared_ptr<MdWindowCallback> &callback);
+ MdWindow::MdWindow(
+  const std::string& id,
+  std::shared_ptr<FlutterWindow> window,
+  HWND window_handle,
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
+  const std::shared_ptr<MdWindowCallback> &callback
+  );
   ~MdWindow();
 
  private:
@@ -33,6 +37,10 @@ class MdWindow {
   std::shared_ptr<FlutterWindow> window_;
 
   std::weak_ptr<MdWindowCallback> callback_;
+
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel_;
+
+  HWND window_handle_;
 
   std::string id_;
 
