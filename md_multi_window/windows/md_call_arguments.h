@@ -42,6 +42,7 @@ struct MdCallArguments {
 
 void from_json(const json& j, MdWindowStyle& style);
 void from_json(const json& j, MdCallArguments& args);
+std::string to_json(const std::optional<std::map<std::string, std::string>>& data);
 std::optional<MdCallArguments> ParseMdCallArguments(const std::string& json_str);
 
 }  // namespace md_multi_window

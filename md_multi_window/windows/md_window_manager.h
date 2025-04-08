@@ -19,17 +19,19 @@ class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, pu
   MdWindowManager();
 
   // create new window
-  std::string CreateWindowAndRegister(std::string id, std::string args);
+  std::string CreateWindowAndRegister(const std::string& args);
 
-  std::string RegisterMainWindow(std::string id, std::shared_ptr<FlutterWindow> window);
+  std::string RegisterMainWindow(const std::string& id, std::shared_ptr<FlutterWindow> window);
 
   flutter::EncodableList GetAllWindowIDs();
 
+  MdWindow* GetWindow(const std::string& id);
+
   // callback used
-  void OnWindowClose(std::string id) override;
-  void OnWindowDestroy(std::string id) override;
+  void OnWindowClose(const std::string& id) override;
+  void OnWindowDestroy(const std::string& id) override;
  private:
-  void AddWindowAndNotifyAll(std::string id, std::unique_ptr<MdWindow> window);
+  void AddWindowAndNotifyAll(const std::string& id, std::unique_ptr<MdWindow> window);
   std::map<std::string, std::unique_ptr<MdWindow>> windows_;
 
 };

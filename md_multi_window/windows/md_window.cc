@@ -14,7 +14,7 @@
 namespace md_multi_window {
 
 MdWindow::MdWindow(
-    std::string id,
+    const std::string& id,
     std::shared_ptr<FlutterWindow> window,
     const std::shared_ptr<MdWindowCallback> &callback
 ) : callback_(callback), id_(id), window_(window) {

@@ -27,7 +27,7 @@ class MdMultiWindowPlugin : public flutter::Plugin {
       const flutter::MethodCall<flutter::EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
  private:
-  void ActionToNative(std::string value, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+  void ActionToNative(const std::string& value, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 };
 
 }  // namespace md_multi_window

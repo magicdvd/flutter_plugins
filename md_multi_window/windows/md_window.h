@@ -16,16 +16,16 @@ namespace md_multi_window {
 class MdWindowCallback {
 
   public:
-    virtual void OnWindowClose(std::string id) = 0;
+    virtual void OnWindowClose(const std::string& id) = 0;
   
-    virtual void OnWindowDestroy(std::string id) = 0;
+    virtual void OnWindowDestroy(const std::string& id) = 0;
   
   };
 
 class MdWindow {
 
  public:
-  MdWindow(std::string id, std::shared_ptr<FlutterWindow>, const std::shared_ptr<MdWindowCallback> &callback);
+  MdWindow(const std::string &id, std::shared_ptr<FlutterWindow>, const std::shared_ptr<MdWindowCallback> &callback);
   ~MdWindow();
 
  private:

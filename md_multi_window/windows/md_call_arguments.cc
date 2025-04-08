@@ -31,6 +31,14 @@ namespace md_multi_window {
         if (j.contains("route")) args.initRoute = j.at("route").get<std::string>();
         if (j.contains("params")) args.extraParams = j.at("params").get<std::map<std::string, std::string>>();
     }
+
+    std::string to_json(const std::optional<std::map<std::string, std::string>>& data) {
+        if (data.has_value()) {
+            return json(*data).dump();  // encode to JSON string
+        } else {
+            return "null";  // or ""
+        }
+    }
     
     std::optional<MdCallArguments> ParseMdCallArguments(const std::string& json_str) {
         try {
