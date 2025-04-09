@@ -22,10 +22,26 @@ MdWindow::MdWindow(
 ) : callback_(callback), id_(id), window_(window), channel_(std::move(channel)),window_handle_(window_handle) {
 
 }
+
 void MdWindow::Destroy() {
 
 }
 
 MdWindow::~MdWindow() {
 }
+
+void MdWindow::SendData(
+    std::unique_ptr<flutter::EncodableValue> data,  
+    std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+    channel_->InvokeMethod("recieveData", std::move(data), std::move(result));
+}
+
+void MdWindow::NotifyFlutter(
+    const std::string& name,
+    const std::string& from_window_id,
+    std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+    channel_->InvokeMethod(name, std::make_unique<flutter::EncodableValue>(flutter::EncodableValue(from_window_id)), std::move(result));
+}
+
+
 }  // namespace md_multi_window

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:md_multi_window/md_multi_window.dart';
 import 'md_multi_window_platform_interface.dart';
@@ -55,6 +56,7 @@ class MdMultiWindowPlatformWindows extends MdMultiWindowPlatform {
   }
 
   Future<dynamic> _handle(MethodCall call) async {
+    debugPrint('window: ${call.method}');
     switch (call.method) {
       case 'notifyWindowCreated':
         final windowID = call.arguments;

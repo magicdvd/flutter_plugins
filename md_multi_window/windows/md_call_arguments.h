@@ -1,17 +1,21 @@
 #ifndef MD_CALL_ARGUMENTS_H_
 #define MD_CALL_ARGUMENTS_H_
 
+#include <windows.h>
 #include <string>
 #include <map>
 #include <vector>
 #include <optional>
 #include "include/md_multi_window/json.hpp"
 
+
 using json = nlohmann::json;
 
 namespace md_multi_window {
 
 struct MdWindowStyle {
+    static float gMainscreenWidth; 
+    static float gMainscreenHeight; 
     float width = 0;
     float height = 0;
     float x = 0;
@@ -30,6 +34,12 @@ struct MdWindowStyle {
     float minSizeH = 0;
     float maxSizeW = 0;
     float maxSizeH = 0;
+
+    SIZE GetMinSize();
+    SIZE GetMaxSize();
+    SIZE GetFrame();
+    POINT GetCenterOrigin(const SIZE& size);
+
 };
 
 struct MdCallArguments {
@@ -44,6 +54,7 @@ void from_json(const json& j, MdWindowStyle& style);
 void from_json(const json& j, MdCallArguments& args);
 std::string to_json(const std::optional<std::map<std::string, std::string>>& data);
 std::optional<MdCallArguments> ParseMdCallArguments(const std::string& json_str);
+SIZE GetCurrentMonitorSize();
 
 }  // namespace md_multi_window
 

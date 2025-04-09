@@ -32,6 +32,14 @@ class MdWindow {
   );
   ~MdWindow();
 
+  void SendData(
+    std::unique_ptr<flutter::EncodableValue> data, 
+    std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = nullptr);
+  
+  void NotifyFlutter(
+      const std::string& name,
+      const std::string& from_window_id,
+      std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = nullptr);
  private:
 
   std::shared_ptr<FlutterWindow> window_;

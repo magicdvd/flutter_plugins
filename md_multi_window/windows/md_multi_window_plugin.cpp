@@ -85,9 +85,19 @@ void MdMultiWindowPlugin::HandleMethodCall(
       result->Success("");
     }
   } else if (method_call.method_name() == "action"){
-    result->NotImplemented();
+    if (auto str_value = std::get_if<std::string>(method_call.arguments())) {
+      std::string val = *str_value;
+      this->ActionToNative(val, std::move(result));
+    } else {
+      std::cout << "EncodableValue is not a string!" << std::endl;
+      result->Success(flutter::EncodableValue(false));
+    }
   } else if (method_call.method_name() == "mainScreenSize"){
-    result->NotImplemented();
+    auto size = md_multi_window::GetCurrentMonitorSize();
+    result->Success(flutter::EncodableMap{
+      {flutter::EncodableValue("w"), flutter::EncodableValue(static_cast<double>(size.cx))},
+      {flutter::EncodableValue("h"), flutter::EncodableValue(static_cast<double>(size.cy))},
+   });
   } else {
     result->NotImplemented();
   }
@@ -97,12 +107,12 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
     auto arguments = ParseMdCallArguments(value);
     if (arguments == std::nullopt) {
       std::cerr << "EncodableValue is not a string!";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
     }
     // 1. targetWindowID
     if (!arguments->targetWindowID.has_value()) {
       std::cerr << "[md_multi_window] failed: missing targetWindowID\n";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
       return;
     }
     const std::string& tid = arguments->targetWindowID.value();
@@ -111,14 +121,14 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
     MdWindow* window = MdWindowManager::Instance()->GetWindow(tid);
     if (window == nullptr) {
       std::cerr << "[md_multi_window] failed: no window for ID = " << tid << "\n";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
       return;
     }
 
     // 3. extraParams
     if (!arguments->extraParams.has_value()) {
       std::cerr << "[md_multi_window] failed: missing extraParams\n";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
       return;
     }
     const auto& params = arguments->extraParams.value();
@@ -127,7 +137,7 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
     auto it = params.find("name");
     if (it == params.end()) {
       std::cerr << "[md_multi_window] failed: 'name' not found in extraParams\n";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
       return;
     }
     const std::string& action = it->second;
@@ -158,10 +168,10 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
       
     }else {
       std::cerr << "[md_multi_window] action not found in extraParams\n";
-      result->Success(false);
+      result->Success(flutter::EncodableValue(false));
       return;
     }
-    result->Success(false);
+    result->Success(flutter::EncodableValue(false));
     return;
 }
 

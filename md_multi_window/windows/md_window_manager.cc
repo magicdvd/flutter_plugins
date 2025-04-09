@@ -2,24 +2,9 @@
 
 #include <memory>
 #include <string>
-#include "md_window.h"
 #include "md_call_arguments.h"
 
 namespace md_multi_window {
-
-SIZE GetCurrentMonitorSize() {
-  HMONITOR monitor = MonitorFromPoint({0,0}, MONITOR_DEFAULTTONEAREST);
-  if (monitor){
-      MONITORINFO monitor_info = { sizeof(MONITORINFO) };
-      if (GetMonitorInfo(monitor, &monitor_info)) {
-        RECT monitor_rect = monitor_info.rcMonitor;
-        int width = monitor_rect.right - monitor_rect.left;
-        int height = monitor_rect.bottom - monitor_rect.top;
-        return {width, height};
-      }
-  }
-  return {0,0};
-}
 
 std::wstring String2WString(const std::string &string) {
   int size_needed = MultiByteToWideChar(CP_UTF8, 0, string.c_str(), -1, nullptr, 0);
@@ -55,16 +40,13 @@ std::string MdWindowManager::CreateWindowAndRegister(const std::string& args) {
       MdWindowStyle style = call_args.windowStyle.value();
       unsigned int x =  static_cast<unsigned int>(style.x);
       unsigned int y =  static_cast<unsigned int>(style.y);
-      unsigned int width =  static_cast<unsigned int>(style.width);
-      unsigned int height =  static_cast<unsigned int>(style.height);
-      SIZE screen_size = GetCurrentMonitorSize();
+      auto frameSize = style.GetFrame();
+      unsigned int width =  static_cast<unsigned int>(frameSize.cx);
+      unsigned int height =  static_cast<unsigned int>(frameSize.cy);
       if (style.center) {
-        if (static_cast<unsigned int>(screen_size.cx)  > width) {
-          x = (screen_size.cx - width) / 2;
-        }
-        if (static_cast<unsigned int>(screen_size.cy)  > height) {
-          y = (screen_size.cy - height) / 2;
-        }
+        auto origin = style.GetCenterOrigin(frameSize);
+        x = static_cast<unsigned int>(origin.x);
+        y = static_cast<unsigned int>(origin.y);
       }
       auto wtitle = String2WString(style.title);
       auto fw = g_create_window_callback({"md_multi_window", id, init_route, to_json(call_args.extraParams)}, id, wtitle, x, y, width, height);
@@ -88,6 +70,12 @@ std::string MdWindowManager::RegisterWindow(
 }
 
 void MdWindowManager::AddWindowAndNotifyAll(const std::string& id, std::unique_ptr<MdWindow> window) {
+  for (auto& pair : windows_) {
+      std::unique_ptr<MdWindow>& window_ptr = pair.second;
+      if (window_ptr) {
+          window_ptr->NotifyFlutter("notifyWindowCreated", id);
+      }
+  }
   windows_[id] = std::move(window);
 }
 

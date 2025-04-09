@@ -3,6 +3,69 @@
 
 namespace md_multi_window {
 
+    float MdWindowStyle::gMainscreenWidth = -1234.0f;
+    float MdWindowStyle::gMainscreenHeight = -4321.0f;
+
+    SIZE GetCurrentMonitorSize() {
+        HMONITOR monitor = MonitorFromPoint({0,0}, MONITOR_DEFAULTTONEAREST);
+        if (monitor){
+            MONITORINFO monitor_info = { sizeof(MONITORINFO) };
+            if (GetMonitorInfo(monitor, &monitor_info)) {
+                RECT monitor_rect = monitor_info.rcMonitor;
+                int width = monitor_rect.right - monitor_rect.left;
+                int height = monitor_rect.bottom - monitor_rect.top;
+                return {width, height};
+            }
+        }
+        return {0,0};
+    }
+
+    SIZE MdWindowStyle::GetMinSize() {
+        float rw = minSizeW;
+        float rh = minSizeH;
+        if (rw == MdWindowStyle::gMainscreenWidth || rh == MdWindowStyle::gMainscreenHeight) {
+            auto size = GetCurrentMonitorSize();
+            rw = (rw == MdWindowStyle::gMainscreenWidth) ? static_cast<float>(size.cx) : rw;
+            rh = (rh == MdWindowStyle::gMainscreenHeight) ? static_cast<float>(size.cy) : rh;
+        }
+        return {static_cast<int>(rw), static_cast<int>(rh)};
+    }
+
+    SIZE MdWindowStyle::GetMaxSize() {
+        float rw = maxSizeW;
+        float rh = maxSizeH;
+        if (rw == MdWindowStyle::gMainscreenWidth || rh == MdWindowStyle::gMainscreenHeight) {
+            auto size = GetCurrentMonitorSize();
+            rw = (rw == MdWindowStyle::gMainscreenWidth) ? static_cast<float>(size.cx) : rw;
+            rh = (rh == MdWindowStyle::gMainscreenHeight) ? static_cast<float>(size.cy) : rh;
+        }
+        return {static_cast<int>(rw), static_cast<int>(rh)};
+    }
+
+    SIZE MdWindowStyle::GetFrame() {
+        float rw = width;
+        float rh = height;
+        if (rw == MdWindowStyle::gMainscreenWidth || rh == MdWindowStyle::gMainscreenHeight) {
+            auto size = GetCurrentMonitorSize();
+            rw = (rw == MdWindowStyle::gMainscreenWidth) ? static_cast<float>(size.cx) : rw;
+            rh = (rh == MdWindowStyle::gMainscreenHeight) ? static_cast<float>(size.cy) : rh;
+        }
+        return {static_cast<int>(rw), static_cast<int>(rh)};
+    }
+
+    POINT MdWindowStyle::GetCenterOrigin(const SIZE& size) {
+        auto msize = GetCurrentMonitorSize();
+        int ox = static_cast<int>(x);
+        int oy = static_cast<int>(y);
+        if (msize.cx > size.cx) {
+            ox = (msize.cx - size.cx) / 2;
+        }
+        if (msize.cy > size.cy) {
+            oy = (msize.cy - size.cy) / 2;
+        }
+        return {static_cast<LONG>(ox), static_cast<LONG>(oy)};
+    }
+
     void from_json(const json& j, MdWindowStyle& style) {
         j.at("w").get_to(style.width);
         j.at("h").get_to(style.height);
