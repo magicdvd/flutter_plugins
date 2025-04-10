@@ -15,9 +15,9 @@ class MdMultiWindowPlugin : public flutter::Plugin {
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
   static void RegisterWindow(
     const std::string& id, 
-    HWND handle, 
     std::shared_ptr<FlutterWindow> fw, 
     flutter::PluginRegistry *registry);
+  static bool HandleMessage(const std::string& id, UINT message);
   MdMultiWindowPlugin();
 
   virtual ~MdMultiWindowPlugin();

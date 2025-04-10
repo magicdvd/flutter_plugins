@@ -61,10 +61,9 @@ std::string MdWindowManager::CreateWindowAndRegister(const std::string& args) {
 std::string MdWindowManager::RegisterWindow(
   const std::string& id, 
   std::shared_ptr<FlutterWindow> fwin,
-  HWND window_handle,
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
 ){
-  auto window = std::make_unique<MdWindow>(id, fwin, window_handle, std::move(channel), shared_from_this());
+  auto window = std::make_unique<MdWindow>(id, fwin, std::move(channel), shared_from_this());
   AddWindowAndNotifyAll(id, std::move(window));
   return id;
 }
@@ -95,7 +94,18 @@ MdWindow* MdWindowManager::GetWindow(const std::string& id) {
   return nullptr;
 }
 
+std::vector<MdWindow*> MdWindowManager::GetAllWindows() {
+  std::vector<MdWindow*> result;
+  for (auto& pair : windows_) {
+    if (pair.second) {
+      result.push_back(pair.second.get());
+    }
+  }
+  return result;
+}
+
 void MdWindowManager::OnWindowClose(const std::string& id) {
+
 }
 
 void MdWindowManager::OnWindowDestroy(const std::string& id) {

@@ -38,6 +38,7 @@ struct MdWindowStyle {
     SIZE GetMinSize();
     SIZE GetMaxSize();
     SIZE GetFrame();
+    SIZE GetFrameByWH(float w, float h);
     POINT GetCenterOrigin(const SIZE& size);
 
 };

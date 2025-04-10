@@ -43,8 +43,12 @@ namespace md_multi_window {
     }
 
     SIZE MdWindowStyle::GetFrame() {
-        float rw = width;
-        float rh = height;
+        return GetFrameByWH(width, height);
+    }
+
+    SIZE MdWindowStyle::GetFrameByWH(float w, float h) {
+        float rw = w;
+        float rh = h;
         if (rw == MdWindowStyle::gMainscreenWidth || rh == MdWindowStyle::gMainscreenHeight) {
             auto size = GetCurrentMonitorSize();
             rw = (rw == MdWindowStyle::gMainscreenWidth) ? static_cast<float>(size.cx) : rw;

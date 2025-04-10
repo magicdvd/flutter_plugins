@@ -37,7 +37,6 @@ void MdMultiWindowPlugin::RegisterWithRegistrar(
 
 void MdMultiWindowPlugin::RegisterWindow(
     const std::string& id, 
-    HWND handle, 
     std::shared_ptr<FlutterWindow> fw, 
     flutter::PluginRegistry *registry) {
     auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
@@ -53,7 +52,16 @@ void MdMultiWindowPlugin::RegisterWindow(
           plugin_pointer->HandleMethodCall(call, std::move(result));
         });
     window_registrar->AddPlugin(std::move(plugin));
-    MdWindowManager::Instance()->RegisterWindow(id, std::move(fw), handle, std::move(channel));
+    MdWindowManager::Instance()->RegisterWindow(id, std::move(fw), std::move(channel));
+}
+
+// HandleMessage true: break false: continue
+bool MdMultiWindowPlugin::HandleMessage(const std::string& id, UINT message){
+    MdWindow* window = MdWindowManager::Instance()->GetWindow(id);
+    if (window) {
+      return window->HandleMessage(message);
+    }
+    return false;
 }
 
 MdMultiWindowPlugin::MdMultiWindowPlugin() {}
@@ -63,6 +71,7 @@ MdMultiWindowPlugin::~MdMultiWindowPlugin() {}
 void MdMultiWindowPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+  // std::cout << "windows method: "<< method_call.method_name() <<std::endl;
   if (method_call.method_name().compare("getPlatformVersion") == 0) {
     std::ostringstream version_stream;
     version_stream << "Windows ";
@@ -79,7 +88,8 @@ void MdMultiWindowPlugin::HandleMethodCall(
   } else if (method_call.method_name() == "createWindow"){
     if (auto str_value = std::get_if<std::string>(method_call.arguments())) {
       std::string val = *str_value;
-      md_multi_window::MdWindowManager::Instance()->CreateWindowAndRegister(val);
+      auto new_window_id = md_multi_window::MdWindowManager::Instance()->CreateWindowAndRegister(val);
+      result->Success(new_window_id);
     } else {
       std::cout << "EncodableValue is not a string!" << std::endl;
       result->Success("");
@@ -108,6 +118,7 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
     if (arguments == std::nullopt) {
       std::cerr << "EncodableValue is not a string!";
       result->Success(flutter::EncodableValue(false));
+      return;
     }
     // 1. targetWindowID
     if (!arguments->targetWindowID.has_value()) {
@@ -141,37 +152,94 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
       return;
     }
     const std::string& action = it->second;
-   
+    std::cout << "windows:" << action << " from:" << arguments->windowID <<std::endl;
     if (action == "canBeShown") {
-
+      result->Success(flutter::EncodableValue(false));
     }else if (action == "sendData") {
-
+      result->Success(flutter::EncodableValue(true));
+      flutter::EncodableMap encodable_map;
+      for (const auto& pair : params) {
+          if (pair.first == "name") {
+            continue;
+          }
+          encodable_map[flutter::EncodableValue(pair.first)] = flutter::EncodableValue(pair.second);
+      }
+      encodable_map[flutter::EncodableValue("sender")] = flutter::EncodableValue(arguments->windowID);
+      window->SendData(std::make_unique<flutter::EncodableValue>(encodable_map));
     }else if (action == "broadcastData") {
-      
+      result->Success(flutter::EncodableValue(true));
+      flutter::EncodableMap encodable_map;
+      for (const auto& pair : params) {
+          if (pair.first == "name") {
+            continue;
+          }
+          encodable_map[flutter::EncodableValue(pair.first)] = flutter::EncodableValue(pair.second);
+      }
+      encodable_map[flutter::EncodableValue("sender")] = flutter::EncodableValue(arguments->windowID);
+      auto wins = MdWindowManager::Instance()->GetAllWindows();
+      for (MdWindow* win : wins) {
+        if (win) {
+            win->SendData(std::make_unique<flutter::EncodableValue>(encodable_map));
+        }
+     }
     }else if (action == "close") {
-      
+      window->Close();
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "performClose"){
-
+      window->PerformClose();
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "show"){
-      
+      window->Show();
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "hide"){
-      
+      window->Hide();
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "center"){
-      
+      window->Center();
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "setTitle"){
-      
+      auto k = params.find("setTitle");
+      if (k != params.end()) {
+        std::string title = k->second;
+        window->SetTitle(title);
+        result->Success(flutter::EncodableValue(true));
+        return;
+      }
+      result->Success(flutter::EncodableValue(false));
     }else if (action == "setFrame"){
-      
+      result->Success(flutter::EncodableValue(false));
     }else if (action == "preventClose"){
-      
+      auto k = params.find("preventClose");
+      if (k != params.end()) {
+        std::string re = k->second;
+        if (re == "true") {
+          window->PreventClose(true);
+        }else{
+          window->PreventClose(false);
+        }
+        result->Success(flutter::EncodableValue(true));
+        return;
+      }
+      result->Success(flutter::EncodableValue(false));
     }else if (action == "preventCloseEnd"){
-      
+      auto k = params.find("preventCloseEnd");
+      if (k != params.end()) {
+        std::string re = k->second;
+        if (re == "true") {
+          window->PreventCloseEnd(true);
+        }else{
+          window->PreventCloseEnd(false);
+        }
+        result->Success(flutter::EncodableValue(true));
+        return;
+      }
+      result->Success(flutter::EncodableValue(false));
     }else {
       std::cerr << "[md_multi_window] action not found in extraParams\n";
       result->Success(flutter::EncodableValue(false));
       return;
     }
-    result->Success(flutter::EncodableValue(false));
+    //result->Success(flutter::EncodableValue(false));
     return;
 }
 

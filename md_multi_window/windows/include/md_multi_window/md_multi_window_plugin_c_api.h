@@ -29,13 +29,13 @@ FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegisterWithRegistrar(
 class FlutterWindow {
     public:
     virtual void Destroy() = 0;
+    virtual HWND GetHandle() = 0;
 };
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_
 
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
     const std::string& id,
-    HWND window_handle_,
     flutter::PluginRegistry *registry,
     std::shared_ptr<FlutterWindow> window
 );
@@ -46,6 +46,11 @@ typedef std::shared_ptr<FlutterWindow> (
     unsigned int width, unsigned int height);
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiSetCreateWindowCallback(
     MdMultiWindowPluginCreateWindowCallback callback);
+
+FLUTTER_PLUGIN_EXPORT bool MdMultiWindowPluginCApiHandleMessagee(
+    const std::string& window_id,
+    const UINT message
+);
 
 #if defined(__cplusplus)
 }  // extern "C"

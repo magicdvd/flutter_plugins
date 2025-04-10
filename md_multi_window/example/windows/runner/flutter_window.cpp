@@ -1,6 +1,7 @@
 #include "flutter_window.h"
 
 #include <optional>
+#include <iostream>
 
 #include "flutter/generated_plugin_registrant.h"
 #include "md_multi_window/md_multi_window_plugin_c_api.h"
@@ -18,7 +19,7 @@ bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
     return false;
   }
-
+  std::cout << "fluterWindow OnCreate called" << std::endl;
   RECT frame = GetClientArea();
 
   // The size here must match the window dimensions to avoid unnecessary surface
@@ -32,7 +33,7 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
-  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->view()->GetNativeWindow(),flutter_controller_->engine(), shared_from_this());
+  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();
@@ -50,7 +51,7 @@ void FlutterWindow::OnDestroy() {
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
-
+  std::cout << "fluterWindow OnDestroy called" << std::endl;
   Win32Window::OnDestroy();
 }
 
@@ -58,6 +59,10 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
+
+  if (message == WM_CLOSE) {
+    std::cout << "fwin mh wm_close" << std::endl;
+  }
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =
@@ -72,6 +77,10 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
     case WM_FONTCHANGE:
       flutter_controller_->engine()->ReloadSystemFonts();
       break;
+  }
+
+  if (MdMultiWindowPluginCApiHandleMessagee(id_, message)) {
+    return 0;
   }
 
   return Win32Window::MessageHandler(hwnd, message, wparam, lparam);
