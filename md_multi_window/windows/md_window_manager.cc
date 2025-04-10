@@ -59,11 +59,12 @@ std::string MdWindowManager::CreateWindowAndRegister(const std::string& args) {
 }
 
 std::string MdWindowManager::RegisterWindow(
-  const std::string& id, 
+  const std::string& id,
+  HWND window_handle,
   std::shared_ptr<FlutterWindow> fwin,
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
 ){
-  auto window = std::make_unique<MdWindow>(id, fwin, std::move(channel), shared_from_this());
+  auto window = std::make_unique<MdWindow>(id, window_handle, fwin, std::move(channel), shared_from_this());
   AddWindowAndNotifyAll(id, std::move(window));
   return id;
 }

@@ -14,10 +14,11 @@ void MdMultiWindowPluginCApiRegisterWithRegistrar(
 
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
   const std::string& id,
+  HWND window_handle,
   flutter::PluginRegistry *registry,
   std::shared_ptr<FlutterWindow> window
 ){
-  md_multi_window::MdMultiWindowPlugin::RegisterWindow(id, window, registry);
+  md_multi_window::MdMultiWindowPlugin::RegisterWindow(id, window_handle, window, registry);
 }
 
 void MdMultiWindowPluginCApiSetCreateWindowCallback(MdMultiWindowPluginCreateWindowCallback callback){

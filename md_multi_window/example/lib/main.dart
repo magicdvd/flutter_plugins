@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
   void closeTest(String id) {
     var window = MdMultiWindow.getWindow(id);
     if (window != null) {
-      debugPrint('${window.id} $id');
+      debugPrint('close ${window.id} from ${MdMultiWindow.currentWindow.id}');
       window.close();
     } else {
       debugPrint('window not exist');
@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
   void hideTest(String id) {
     var window = MdMultiWindow.getWindow(id);
     if (window != null) {
-      debugPrint('${window.id} $id');
+      debugPrint('hide ${window.id} from ${MdMultiWindow.currentWindow.id}');
       window.hide();
     } else {
       debugPrint('window not exist');
@@ -104,7 +104,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
   void showTest(String id) {
     var window = MdMultiWindow.getWindow(id);
     if (window != null) {
-      debugPrint('${window.id} $id');
+      debugPrint('show ${window.id} from ${MdMultiWindow.currentWindow.id}');
       window.show();
     } else {
       debugPrint('window not exist');

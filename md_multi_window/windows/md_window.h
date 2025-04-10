@@ -25,6 +25,7 @@ class MdWindow {
  public:
   MdWindow(
     const std::string& id,
+    HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
     std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
     const std::shared_ptr<MdWindowCallback> &callback
@@ -70,6 +71,8 @@ private:
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel_;
 
   std::string id_;
+
+  HWND window_handle_;
 
   bool shouldClose_;
 

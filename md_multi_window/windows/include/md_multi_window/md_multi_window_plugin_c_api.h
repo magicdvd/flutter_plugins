@@ -29,13 +29,13 @@ FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegisterWithRegistrar(
 class FlutterWindow {
     public:
     virtual void Destroy() = 0;
-    virtual HWND GetHandle() = 0;
 };
 
 #endif  // RUNNER_FLUTTER_WINDOW_H_
 
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
     const std::string& id,
+    HWND window_handle,
     flutter::PluginRegistry *registry,
     std::shared_ptr<FlutterWindow> window
 );

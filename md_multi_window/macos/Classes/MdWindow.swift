@@ -145,11 +145,10 @@ public class MdWindow: NSObject {
   }
 
   func preventCloseEnd(_ b: Bool) {
+    preventCloseProcessing = false
     if b {
       preventCloseForceClose = true
       window?.close()
-    } else {
-      preventCloseProcessing = false
     }
   }
 

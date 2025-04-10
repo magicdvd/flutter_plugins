@@ -36,7 +36,8 @@ void MdMultiWindowPlugin::RegisterWithRegistrar(
 }
 
 void MdMultiWindowPlugin::RegisterWindow(
-    const std::string& id, 
+    const std::string& id,
+    HWND window_handle,
     std::shared_ptr<FlutterWindow> fw, 
     flutter::PluginRegistry *registry) {
     auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
@@ -52,7 +53,7 @@ void MdMultiWindowPlugin::RegisterWindow(
           plugin_pointer->HandleMethodCall(call, std::move(result));
         });
     window_registrar->AddPlugin(std::move(plugin));
-    MdWindowManager::Instance()->RegisterWindow(id, std::move(fw), std::move(channel));
+    MdWindowManager::Instance()->RegisterWindow(id, window_handle, std::move(fw), std::move(channel));
 }
 
 // HandleMessage true: break false: continue

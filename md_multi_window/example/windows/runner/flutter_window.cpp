@@ -33,7 +33,7 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
-  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this());
+  MdMultiWindowPluginCApiRegister(id_,this->GetHandle(),flutter_controller_->engine(), shared_from_this());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();
@@ -82,6 +82,9 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
   if (MdMultiWindowPluginCApiHandleMessagee(id_, message)) {
     return 0;
   }
-
+  if (message == WM_DESTROY) {
+    std::cout << "fwin mh wm_destroy" << std::endl;
+    return 0;
+  }
   return Win32Window::MessageHandler(hwnd, message, wparam, lparam);
 }
