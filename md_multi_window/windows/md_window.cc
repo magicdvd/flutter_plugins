@@ -25,20 +25,33 @@ MdWindow::MdWindow(
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
     std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    const std::shared_ptr<MdWindowCallback> &callback
-) : callback_(callback), id_(id), window_handle_(window_handle), window_(window), channel_(std::move(channel)),
-shouldClose_(true), preventCloseForceClose_(false), preventCloseProcessing_(false),canBeShown_(true),destroyed_(false) {
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
+) : id_(id), window_handle_(window_handle), window_(window), channel_(std::move(channel)),
+shouldClose_(true), preventCloseForceClose_(false), preventCloseProcessing_(false),canBeShown_(true),destroyed_(false),
+hideOnLaunch_(hide_on_launch), lastWindowClosedShouldTerminateApp_(last_window_should_terminate_app) {
 
+}
+
+bool MdWindow::GetLastWindowClosedShouldTerminateApp(){
+  return lastWindowClosedShouldTerminateApp_;
 }
 
 void MdWindow::Destroy() {
+  if (window_handle_) {
+    window_handle_ = nullptr;
+  }
+  if (window_) {
+    window_.reset();
+  }
   if (channel_) {
     channel_ = nullptr;
   }
-  std::cout << "winodow destroyed" << std::endl;
+  std::cout << "winodow destroyed " << window_handle_ << std::endl;
 }
 
 MdWindow::~MdWindow() {
+  Destroy();
 }
 
 void MdWindow::Close(){
@@ -110,43 +123,31 @@ void MdWindow::SendToFlutter(
   channel_->InvokeMethod(name, std::make_unique<flutter::EncodableValue>(flutter::EncodableValue(id_)), std::move(result));
 }
 
-bool MdWindow::HandleMessage(const UINT message){
-  switch (message) {
-    case WM_DESTROY:
-      Destroy();
-      if (!destroyed_) {
-        destroyed_ = true;
-        if (auto callback = callback_.lock()) {
-          callback->OnWindowDestroy(id_);
-        }
-      }
-      return true;
-    case WM_CLOSE:
-      std::cout << "preventCloseProcessing_" << preventCloseProcessing_ << std::endl;
-      std::cout << "preventCloseForceClose_" << preventCloseForceClose_ << std::endl;
-      std::cout << "shouldClose_" << shouldClose_ << std::endl;
-      if (preventCloseProcessing_) {
-        return true;
-      }
-      if (!preventCloseForceClose_){
-        if (!shouldClose_) {
-          preventCloseProcessing_ = true;
-          this->SendToFlutter("onShouldClose");
-          return true;
-        }
-      }
-      
-      if (auto callback = callback_.lock()) {
-        callback->OnWindowClose(id_);
-      }
-
-      preventCloseForceClose_ = false;
-      preventCloseProcessing_ =  false;
-      this->SendToFlutter("onClose");
-      std::cout << "use_count: " << window_.use_count() << std::endl; 
-      break;
+bool MdWindow::DoCloseCheck(){
+  std::cout << "preventCloseProcessing_" << preventCloseProcessing_ << std::endl;
+  std::cout << "preventCloseForceClose_" << preventCloseForceClose_ << std::endl;
+  std::cout << "shouldClose_" << shouldClose_ << std::endl;
+  if (preventCloseProcessing_) {
+    return false;
   }
-  return false;
+  if (!preventCloseForceClose_){
+    if (!shouldClose_) {
+      preventCloseProcessing_ = true;
+      this->SendToFlutter("onShouldClose");
+      return false;
+    }
+  }
+  preventCloseForceClose_ = false;
+  preventCloseProcessing_ =  false;
+  std::cout << "use_count: " << window_.use_count() << std::endl;
+  if (window_handle_) {
+    DestroyWindow(window_handle_);
+  }
+  return true;
+}
+
+HWND  MdWindow::HANDLE(){
+  return window_handle_;
 }
 
 

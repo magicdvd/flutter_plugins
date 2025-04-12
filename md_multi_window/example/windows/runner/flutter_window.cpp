@@ -11,8 +11,10 @@ FlutterWindow::FlutterWindow(const flutter::DartProject& project)
 
 FlutterWindow::~FlutterWindow() {}
 
-void FlutterWindow::SetWindowID(const std::string& id) {
+void FlutterWindow::SetParams(bool hide_on_launch, bool last_window_should_terminate_app, const std::string& id) {
   id_ = id;
+  hide_on_launch_ = hide_on_launch;
+  last_window_should_terminate_app_ = last_window_should_terminate_app;
 }
 
 bool FlutterWindow::OnCreate() {
@@ -33,7 +35,7 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
-  MdMultiWindowPluginCApiRegister(id_,this->GetHandle(),flutter_controller_->engine(), shared_from_this());
+  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this(), hide_on_launch_, last_window_should_terminate_app_);
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();
@@ -79,12 +81,9 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
       break;
   }
 
-  if (MdMultiWindowPluginCApiHandleMessagee(id_, message)) {
+  if (MdMultiWindowPluginCApiHandleMessagee(id_, message, wparam, lparam)) {
     return 0;
   }
-  if (message == WM_DESTROY) {
-    std::cout << "fwin mh wm_destroy" << std::endl;
-    return 0;
-  }
+
   return Win32Window::MessageHandler(hwnd, message, wparam, lparam);
 }

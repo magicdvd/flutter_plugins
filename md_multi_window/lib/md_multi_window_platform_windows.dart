@@ -56,7 +56,7 @@ class MdMultiWindowPlatformWindows extends MdMultiWindowPlatform {
   }
 
   Future<dynamic> _handle(MethodCall call) async {
-    debugPrint('window: ${call.method}');
+    debugPrint('window: ${call.method} ${call.arguments}');
     switch (call.method) {
       case 'notifyWindowCreated':
         final windowID = call.arguments;

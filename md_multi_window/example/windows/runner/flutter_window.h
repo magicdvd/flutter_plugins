@@ -14,7 +14,7 @@ class FlutterWindow : public std::enable_shared_from_this<FlutterWindow>, public
   // Creates a new FlutterWindow hosting a Flutter view running |project|.
   explicit FlutterWindow(const flutter::DartProject& project);
   virtual ~FlutterWindow();
-  void SetWindowID(const std::string& id = "md_mulit_window_main");
+  void SetParams(bool hide_on_launch, bool last_window_should_terminate_app, const std::string& id = "md_mulit_window_main");
  protected:
   // Win32Window:
   bool OnCreate() override;
@@ -26,6 +26,8 @@ class FlutterWindow : public std::enable_shared_from_this<FlutterWindow>, public
   // The project to run.
   flutter::DartProject project_;
   std::string id_;
+  bool hide_on_launch_;
+  bool last_window_should_terminate_app_;
 
   // The Flutter instance hosted by this window.
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;

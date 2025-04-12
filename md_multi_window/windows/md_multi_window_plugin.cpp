@@ -37,9 +37,11 @@ void MdMultiWindowPlugin::RegisterWithRegistrar(
 
 void MdMultiWindowPlugin::RegisterWindow(
     const std::string& id,
-    HWND window_handle,
     std::shared_ptr<FlutterWindow> fw, 
-    flutter::PluginRegistry *registry) {
+    flutter::PluginRegistry *registry,
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
+  ) {
     auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
     auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
       ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar);
@@ -53,19 +55,17 @@ void MdMultiWindowPlugin::RegisterWindow(
           plugin_pointer->HandleMethodCall(call, std::move(result));
         });
     window_registrar->AddPlugin(std::move(plugin));
-    MdWindowManager::Instance()->RegisterWindow(id, window_handle, std::move(fw), std::move(channel));
+    auto window_handle = ::GetAncestor(window_registrar->GetView()->GetNativeWindow(), GA_ROOT);
+    MdWindowManager::Instance()->RegisterWindow(id, window_handle, std::move(fw), std::move(channel),hide_on_launch,last_window_should_terminate_app);
 }
 
 // HandleMessage true: break false: continue
-bool MdMultiWindowPlugin::HandleMessage(const std::string& id, UINT message){
-    MdWindow* window = MdWindowManager::Instance()->GetWindow(id);
-    if (window) {
-      return window->HandleMessage(message);
-    }
-    return false;
+bool MdMultiWindowPlugin::HandleMessage(const std::string& id, UINT message,  WPARAM const wparam,
+  LPARAM const lparam){
+    return MdWindowManager::Instance()->HandleMesssage(id, message, wparam, lparam);
 }
 
-MdMultiWindowPlugin::MdMultiWindowPlugin() {}
+MdMultiWindowPlugin::MdMultiWindowPlugin(){}
 
 MdMultiWindowPlugin::~MdMultiWindowPlugin() {}
 

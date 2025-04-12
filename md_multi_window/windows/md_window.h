@@ -13,13 +13,6 @@
 
 namespace md_multi_window {
 
-class MdWindowCallback {
-
-  public:
-    virtual void OnWindowClose(const std::string& id) = 0;
-    virtual void OnWindowDestroy(const std::string& id) = 0;
-  };
-
 class MdWindow {
 
  public:
@@ -28,7 +21,8 @@ class MdWindow {
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
     std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    const std::shared_ptr<MdWindowCallback> &callback
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
   );
   ~MdWindow();
 
@@ -40,6 +34,10 @@ class MdWindow {
       const std::string& name,
       const std::string& from_window_id,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = nullptr);
+
+  void SendToFlutter(
+    const std::string& name,
+    std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = nullptr);
   
   void Close();
 
@@ -61,12 +59,14 @@ class MdWindow {
 
   void SetCanBeShown();
 
-  bool HandleMessage(const UINT message);
+  bool DoCloseCheck();
+
+  bool GetLastWindowClosedShouldTerminateApp();
+
+  HWND HANDLE();
 
 private:
   std::shared_ptr<FlutterWindow> window_;
-
-  std::weak_ptr<MdWindowCallback> callback_;
 
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel_;
 
@@ -84,9 +84,9 @@ private:
 
   bool destroyed_;
 
-  void SendToFlutter(
-    const std::string& name,
-    std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result = nullptr);
+  bool lastWindowClosedShouldTerminateApp_;
+
+  bool hideOnLaunch_;
 
   void Destroy();
 };

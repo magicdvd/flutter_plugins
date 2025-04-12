@@ -10,7 +10,7 @@
 
 namespace md_multi_window {
 
-class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, public MdWindowCallback{
+class MdWindowManager{
 
  public:
   static MdMultiWindowPluginCreateWindowCallback g_create_window_callback;
@@ -25,7 +25,9 @@ class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, pu
     const std::string& id,
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
-    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
   );
 
   flutter::EncodableList GetAllWindowIDs();
@@ -34,9 +36,9 @@ class MdWindowManager : public std::enable_shared_from_this<MdWindowManager>, pu
 
   MdWindow* GetWindow(const std::string& id);
 
-  // callback used
-  void OnWindowClose(const std::string& id) override;
-  void OnWindowDestroy(const std::string& id) override;
+  bool HandleMesssage(const std::string& id, UINT message,  WPARAM const wparam,
+    LPARAM const lparam);
+
  private:
   void AddWindowAndNotifyAll(const std::string& id, std::unique_ptr<MdWindow> window);
   std::map<std::string, std::unique_ptr<MdWindow>> windows_;

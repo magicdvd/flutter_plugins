@@ -46,6 +46,7 @@ class _MyAppState extends State<MyApp> with MdWindowDelegate, MdWindowBridge {
     }
     Map<String, bool> mp = {};
     for (var id in ids) {
+      debugPrint("exampe exist $id");
       mp[id] = true;
     }
     for (var nid in [MdMultiWindow.defaultMainWindowID, 'w1', 'w2']) {

@@ -35,21 +35,32 @@ class FlutterWindow {
 
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
     const std::string& id,
-    HWND window_handle,
     flutter::PluginRegistry *registry,
-    std::shared_ptr<FlutterWindow> window
+    std::shared_ptr<FlutterWindow> window,
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
 );
 
 typedef std::shared_ptr<FlutterWindow> (
     *MdMultiWindowPluginCreateWindowCallback)(
-    std::vector<std::string> command_line_arguments, const std::string& id, const std::wstring& title, unsigned int x, unsigned int y,
-    unsigned int width, unsigned int height);
+    std::vector<std::string> command_line_arguments, 
+    const std::string& id, 
+    const std::wstring& title, 
+    unsigned int x, 
+    unsigned int y,
+    unsigned int width, 
+    unsigned int height,
+    bool hide_on_launch,
+    bool last_window_should_terminate_app
+);
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiSetCreateWindowCallback(
     MdMultiWindowPluginCreateWindowCallback callback);
 
 FLUTTER_PLUGIN_EXPORT bool MdMultiWindowPluginCApiHandleMessagee(
     const std::string& window_id,
-    const UINT message
+    const UINT message,
+    WPARAM const wparam,
+    LPARAM const lparam
 );
 
 #if defined(__cplusplus)
