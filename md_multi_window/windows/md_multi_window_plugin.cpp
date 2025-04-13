@@ -14,33 +14,28 @@
 
 #include "md_window_manager.h"
 #include "md_call_arguments.h"
+#include "md_debug.h"
 
 namespace md_multi_window {
+
+bool safeStrToFloat(const std::map<std::string, std::string>& map, const std::string& key, float& out) {
+  auto it = map.find(key);
+  if (it == map.end()) return false;
+  const std::string& str = it->second;
+  char* end;
+  out = std::strtof(str.c_str(), &end);
+  return end != str.c_str() && *end == '\0';
+}
 
 // static
 void MdMultiWindowPlugin::RegisterWithRegistrar(
   flutter::PluginRegistrarWindows *registrar) {
-  // auto channel =
-  //     std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-  //         registrar->messenger(), "magicd/md_multi_window/method",
-  //         &flutter::StandardMethodCodec::GetInstance());
-
-  // auto plugin = std::make_unique<MdMultiWindowPlugin>();
-
-  // channel->SetMethodCallHandler(
-  //     [plugin_pointer = plugin.get()](const auto &call, auto result) {
-  //       plugin_pointer->HandleMethodCall(call, std::move(result));
-  //     });
-
-  // registrar->AddPlugin(std::move(plugin));
 }
 
 void MdMultiWindowPlugin::RegisterWindow(
     const std::string& id,
     std::shared_ptr<FlutterWindow> fw, 
-    flutter::PluginRegistry *registry,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    flutter::PluginRegistry *registry
   ) {
     auto registrar = registry->GetRegistrarForPlugin("MdMultiWindowPluginCApi");
     auto window_registrar = flutter::PluginRegistrarManager::GetInstance()
@@ -56,7 +51,7 @@ void MdMultiWindowPlugin::RegisterWindow(
         });
     window_registrar->AddPlugin(std::move(plugin));
     auto window_handle = ::GetAncestor(window_registrar->GetView()->GetNativeWindow(), GA_ROOT);
-    MdWindowManager::Instance()->RegisterWindow(id, window_handle, std::move(fw), std::move(channel),hide_on_launch,last_window_should_terminate_app);
+    MdWindowManager::Instance()->RegisterWindow(id, window_handle, std::move(fw), std::move(channel));
 }
 
 // HandleMessage true: break false: continue
@@ -72,7 +67,7 @@ MdMultiWindowPlugin::~MdMultiWindowPlugin() {}
 void MdMultiWindowPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
-  // std::cout << "windows method: "<< method_call.method_name() <<std::endl;
+    DEBUG_LOG("windows method " << method_call.method_name());
   if (method_call.method_name().compare("getPlatformVersion") == 0) {
     std::ostringstream version_stream;
     version_stream << "Windows ";
@@ -153,9 +148,10 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
       return;
     }
     const std::string& action = it->second;
-    std::cout << "windows:" << action << " from:" << arguments->windowID <<std::endl;
+    DEBUG_LOG("windows method(action) " << action << " from: "<< arguments->windowID);
     if (action == "canBeShown") {
-      result->Success(flutter::EncodableValue(false));
+      // do nothing
+      result->Success(flutter::EncodableValue(true));
     }else if (action == "sendData") {
       result->Success(flutter::EncodableValue(true));
       flutter::EncodableMap encodable_map;
@@ -202,13 +198,37 @@ void MdMultiWindowPlugin::ActionToNative(const std::string& value, std::unique_p
       auto k = params.find("setTitle");
       if (k != params.end()) {
         std::string title = k->second;
-        window->SetTitle(title);
+        std::wstring wtitle = md_multi_window::String2WString(title);
+        window->SetTitle(wtitle);
         result->Success(flutter::EncodableValue(true));
         return;
       }
       result->Success(flutter::EncodableValue(false));
     }else if (action == "setFrame"){
+      float x = 0;
+      float y = 0;
+      float w = 0;
+      float h = 0;
+      if (!safeStrToFloat(params, "setFrame.x", x)||!safeStrToFloat(params, "setFrame.y", y)||!safeStrToFloat(params, "setFrame.w", w)||!safeStrToFloat(params, "setFrame.h", h)){
+        result->Success(flutter::EncodableValue(false));
+        return;
+      }
+      MdWindowStyle style;
+      SIZE size = style.GetFrameByWH(w,h);
+      auto k = params.find("setFrame.k");
+      if (k != params.end()) {
+        std::string re = k->second;
+        if (re == "true") {
+          POINT pt = style.GetCenterOrigin(size);
+          window->SetFrame(pt, size);
+        }else{
+          window->SetFrame({static_cast<int>(x),static_cast<int>(y)}, size);
+        }
+        result->Success(flutter::EncodableValue(true));
+        return;
+      }
       result->Success(flutter::EncodableValue(false));
+      return;
     }else if (action == "preventClose"){
       auto k = params.find("preventClose");
       if (k != params.end()) {

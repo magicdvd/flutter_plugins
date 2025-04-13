@@ -5,6 +5,7 @@
 #include "md_call_arguments.h"
 #include <thread>
 #include <mutex>
+#include "md_debug.h"
 
 namespace md_multi_window {
 
@@ -63,9 +64,7 @@ std::string MdWindowManager::CreateWindowAndRegister(const std::string& args) {
         x, 
         y, 
         width, 
-        height,
-        style.hideOnLaunch,
-        style.lastWindowClosedShouldTerminateApp
+        height
       );
       return id;
     }
@@ -77,11 +76,9 @@ std::string MdWindowManager::RegisterWindow(
   const std::string& id,
   HWND window_handle,
   std::shared_ptr<FlutterWindow> fwin,
-  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-  bool hide_on_launch,
-  bool last_window_should_terminate_app
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
 ){
-  auto window = std::make_unique<MdWindow>(id, window_handle, fwin, std::move(channel), hide_on_launch,last_window_should_terminate_app);
+  auto window = std::make_unique<MdWindow>(id, window_handle, fwin, std::move(channel));
   AddWindowAndNotifyAll(id, std::move(window));
   return id;
 }
@@ -131,47 +128,15 @@ bool MdWindowManager::HandleMesssage(const std::string& id, UINT message,  WPARA
     case WM_EXECUTE_CALLBACK: {
         std::string* str = reinterpret_cast<std::string*>(lparam);
         if (str) {
-            std::cout << "Received string: " << *str << std::endl;
             windows_.erase(*str);
             delete str;
+            DEBUG_LOG("window size: " << windows_.size());
         }
         return true;
       } 
     case WM_DESTROY: {
-        auto window = GetWindow(id);
-        if (!window){
-          return false;
-        }
-        bool quit = false;
-        if (windows_.size() == 1 && window->GetLastWindowClosedShouldTerminateApp()) {
-          quit = true;
-        }
-        //bool posted = false;
-        //std::cout << "window count "<< window.use_count() << windows_.size() << id << std::endl;
-        //windows_.erase(id);
-        if (quit) {
+        if (windows_.size() == 1) {
           PostQuitMessage(0);
-        }else{
-          
-          // for (auto& pair : windows_) {
-          //   if (pair.first == id) {
-          //     continue;
-          //   }
-          //   std::unique_ptr<MdWindow>& window_ptr = pair.second;
-          //   if (window_ptr) {
-          //       window_ptr->NotifyFlutter("notifyWindowClose", id);
-          //       if (!posted) {
-                  
-          //         auto* payload = new std::string(id);
-          //         std::cout << "win2: " << window_ptr->HANDLE() << std::endl;
-          //         PostMessage(window_ptr->HANDLE(), WM_EXECUTE_CALLBACK, 0, reinterpret_cast<LPARAM>(payload));
-          //         posted = true;
-          //       }
-                
-          //   }
-          // }
-          // window->SendToFlutter("onClose");
-          
         }
         return true;
       }
@@ -180,12 +145,8 @@ bool MdWindowManager::HandleMesssage(const std::string& id, UINT message,  WPARA
       if (!window){
         return false;
       }
-      // auto* payload = new std::string(id);
-      // std::cout << "win2: " << window->HANDLE() << std::endl;
-      // PostMessage(window->HANDLE(), WM_EXECUTE_CALLBACK, 0, reinterpret_cast<LPARAM>(payload));
       bool posted = false;
       if (window->DoCloseCheck()) {
-        std::cout << "ws: " << windows_.size() << std::endl;
         for (auto& pair : windows_) {
           if (pair.first == id) {
             continue;
@@ -195,7 +156,6 @@ bool MdWindowManager::HandleMesssage(const std::string& id, UINT message,  WPARA
               window_ptr->NotifyFlutter("notifyWindowClose", id);
               if (!posted) {
                 auto* payload = new std::string(id);
-                std::cout << "win2: " << window_ptr->HANDLE() << std::endl;
                 PostMessage(window_ptr->HANDLE(), WM_EXECUTE_CALLBACK, 0, reinterpret_cast<LPARAM>(payload));
                 posted = true;
               }
@@ -208,30 +168,5 @@ bool MdWindowManager::HandleMesssage(const std::string& id, UINT message,  WPARA
   }
   return false;
 }
-
-// std::mutex threadMtx;
-
-// void MdWindowManager::OnWindowDestroy(const std::string& id) {
-//   if (windows_.size() == 1) {
-//       auto win = GetWindow(id);
-//       if (win) {
-//         canTermiateApp_ = win->GetLastWindowClosedShouldTerminateApp();
-//       }
-//   }
-//   std::string id_copy = id;
-//   std::thread([this,id_copy]() {
-//     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-//     threadMtx.lock();
-//     auto win = windows_[id_copy];
-//     windows_.erase(id_copy); 
-//     if (win) {
-//       std::cout << "window count "<< win.use_count() << windows_.size() << id_copy << std::endl;
-//     }else{
-//       std::cout << "window count "<<  windows_.size() << id_copy << std::endl;
-//     }
-//     threadMtx.unlock();
-//   }).detach();
- 
-// }
 
 }  // namespace md_multi_window

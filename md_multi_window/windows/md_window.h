@@ -20,9 +20,7 @@ class MdWindow {
     const std::string& id,
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
-    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
   );
   ~MdWindow();
 
@@ -53,15 +51,11 @@ class MdWindow {
 
   void Center();
 
-  void SetFrame(SIZE size, bool keepCenter);
+  void SetFrame(POINT pt, SIZE size);
 
-  void SetTitle(std::string title);
-
-  void SetCanBeShown();
+  void SetTitle(std::wstring title);
 
   bool DoCloseCheck();
-
-  bool GetLastWindowClosedShouldTerminateApp();
 
   HWND HANDLE();
 
@@ -79,14 +73,6 @@ private:
   bool preventCloseForceClose_;
 
   bool preventCloseProcessing_;
-
-  bool canBeShown_;
-
-  bool destroyed_;
-
-  bool lastWindowClosedShouldTerminateApp_;
-
-  bool hideOnLaunch_;
 
   void Destroy();
 };

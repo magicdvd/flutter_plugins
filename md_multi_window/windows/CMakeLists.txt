@@ -26,6 +26,7 @@ list(APPEND PLUGIN_SOURCES
   "md_window.h"
   "md_call_arguments.cc"
   "md_call_arguments.h"
+  "md_debug.h"
   "include/md_multi_window/json.hpp"
 )
 

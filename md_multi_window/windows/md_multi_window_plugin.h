@@ -16,9 +16,7 @@ class MdMultiWindowPlugin : public flutter::Plugin {
   static void RegisterWindow(
     const std::string& id, 
     std::shared_ptr<FlutterWindow> fw, 
-    flutter::PluginRegistry *registry,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    flutter::PluginRegistry *registry
   );
   static bool HandleMessage(const std::string& id, UINT message,  WPARAM const wparam,
     LPARAM const lparam);

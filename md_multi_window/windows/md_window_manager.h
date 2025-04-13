@@ -10,6 +10,8 @@
 
 namespace md_multi_window {
 
+std::wstring String2WString(const std::string &string);
+
 class MdWindowManager{
 
  public:
@@ -25,9 +27,7 @@ class MdWindowManager{
     const std::string& id,
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
-    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
   );
 
   flutter::EncodableList GetAllWindowIDs();

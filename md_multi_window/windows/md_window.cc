@@ -7,34 +7,21 @@
 
 #include <iostream>
 #include <utility>
-
+#include "md_debug.h"
 
 #include "md_multi_window_plugin.h"
+#include "md_call_arguments.h"
 
 namespace md_multi_window {
 
-  // bool shouldClose_;
-
-  // bool preventCloseForceClose_;
-
-  // bool preventCloseProcessing_;
-
-  // bool canBeShown_;
 MdWindow::MdWindow(
     const std::string& id,
     HWND window_handle,
     std::shared_ptr<FlutterWindow> window,
-    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel
 ) : id_(id), window_handle_(window_handle), window_(window), channel_(std::move(channel)),
-shouldClose_(true), preventCloseForceClose_(false), preventCloseProcessing_(false),canBeShown_(true),destroyed_(false),
-hideOnLaunch_(hide_on_launch), lastWindowClosedShouldTerminateApp_(last_window_should_terminate_app) {
+shouldClose_(true), preventCloseForceClose_(false), preventCloseProcessing_(false){
 
-}
-
-bool MdWindow::GetLastWindowClosedShouldTerminateApp(){
-  return lastWindowClosedShouldTerminateApp_;
 }
 
 void MdWindow::Destroy() {
@@ -47,7 +34,7 @@ void MdWindow::Destroy() {
   if (channel_) {
     channel_ = nullptr;
   }
-  std::cout << "winodow destroyed " << window_handle_ << std::endl;
+  DEBUG_LOG("mdwindow destroyed " << window_.use_count());
 }
 
 MdWindow::~MdWindow() {
@@ -60,7 +47,7 @@ void MdWindow::Close(){
   if (IsWindow(handle)) {
     PostMessage(handle, WM_CLOSE, 0, 0);
   }else{
-    std::cout << "close window window is not window " << handle << std::endl;
+    std::cerr << "close window window is not window " << handle << std::endl;
   }
 }
 
@@ -86,22 +73,31 @@ void MdWindow::PreventCloseEnd(bool yesOrNo){
 }
 
 void MdWindow::Show(){
+  ShowWindow(window_handle_, SW_SHOWNORMAL);
 }
 
 void MdWindow:: Hide(){
+  SendToFlutter("onHide");
+  ShowWindow(window_handle_, SW_HIDE);
 }
 
 void MdWindow::Center(){
+  RECT rc;
+  GetWindowRect(window_handle_, &rc);
+  MdWindowStyle style;
+  POINT pt = style.GetCenterOrigin({rc.right-rc.left, rc.bottom - rc.top});
+  SetWindowPos(window_handle_, nullptr, pt.x, pt.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-void MdWindow::SetFrame(SIZE size, bool keepCenter){
+void MdWindow::SetFrame(POINT pt, SIZE size){
+  MoveWindow(window_handle_, pt.x, pt.y,
+  size.cx,
+  size.cy,
+  TRUE);
 }
 
-void MdWindow::SetTitle(std::string title){
-}
-
-void MdWindow::SetCanBeShown(){
-  canBeShown_ = true;
+void MdWindow::SetTitle(std::wstring title){
+  SetWindowText(window_handle_, title.c_str());
 }
 
 void MdWindow::SendData(
@@ -124,9 +120,7 @@ void MdWindow::SendToFlutter(
 }
 
 bool MdWindow::DoCloseCheck(){
-  std::cout << "preventCloseProcessing_" << preventCloseProcessing_ << std::endl;
-  std::cout << "preventCloseForceClose_" << preventCloseForceClose_ << std::endl;
-  std::cout << "shouldClose_" << shouldClose_ << std::endl;
+  DEBUG_LOG("preventCloseProcessing:" << preventCloseProcessing_ << " preventCloseForceClose:" << preventCloseForceClose_ << " shouldClose:" << shouldClose_);
   if (preventCloseProcessing_) {
     return false;
   }
@@ -139,7 +133,6 @@ bool MdWindow::DoCloseCheck(){
   }
   preventCloseForceClose_ = false;
   preventCloseProcessing_ =  false;
-  std::cout << "use_count: " << window_.use_count() << std::endl;
   if (window_handle_) {
     DestroyWindow(window_handle_);
   }

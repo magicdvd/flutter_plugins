@@ -15,11 +15,9 @@ void MdMultiWindowPluginCApiRegisterWithRegistrar(
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
   const std::string& id,
   flutter::PluginRegistry *registry,
-  std::shared_ptr<FlutterWindow> window,
-  bool hide_on_launch,
-  bool last_window_should_terminate_app
+  std::shared_ptr<FlutterWindow> window
 ){
-  md_multi_window::MdMultiWindowPlugin::RegisterWindow(id, window, registry, hide_on_launch,last_window_should_terminate_app);
+  md_multi_window::MdMultiWindowPlugin::RegisterWindow(id, window, registry);
 }
 
 void MdMultiWindowPluginCApiSetCreateWindowCallback(MdMultiWindowPluginCreateWindowCallback callback){

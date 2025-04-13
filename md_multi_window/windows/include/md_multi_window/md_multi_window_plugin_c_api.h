@@ -36,9 +36,7 @@ class FlutterWindow {
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiRegister(
     const std::string& id,
     flutter::PluginRegistry *registry,
-    std::shared_ptr<FlutterWindow> window,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    std::shared_ptr<FlutterWindow> window
 );
 
 typedef std::shared_ptr<FlutterWindow> (
@@ -49,9 +47,7 @@ typedef std::shared_ptr<FlutterWindow> (
     unsigned int x, 
     unsigned int y,
     unsigned int width, 
-    unsigned int height,
-    bool hide_on_launch,
-    bool last_window_should_terminate_app
+    unsigned int height
 );
 FLUTTER_PLUGIN_EXPORT void MdMultiWindowPluginCApiSetCreateWindowCallback(
     MdMultiWindowPluginCreateWindowCallback callback);

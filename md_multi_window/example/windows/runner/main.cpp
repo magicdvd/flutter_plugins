@@ -26,38 +26,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
+  //multi window changeed here(B)
   {
     auto window = std::make_shared<FlutterWindow>(project);
     // add here
-    window->SetParams(true, true);
+    window->SetParams();
     Win32Window::Point origin(10, 10);
     Win32Window::Size size(1280, 720);
 
     if (!window->Create(L"md_multi_window_example", origin, size)) {
       return EXIT_FAILURE;
     }
-    //multi window changeed here(B)
-    
     // true => false
     window->SetQuitOnClose(false);
   }
 
   MdMultiWindowPluginCApiSetCreateWindowCallback(
     [](std::vector<std::string> command_line_arguments, const std::string& id, const std::wstring& title, unsigned int x, unsigned int y,
-      unsigned int width, unsigned int height, bool hide_on_launch, bool last_window_should_terminate_app) {
+      unsigned int width, unsigned int height) {
       flutter::DartProject project(L"data");
 
       project.set_dart_entrypoint_arguments(
           std::move(command_line_arguments));
 
       auto fw = std::make_shared<FlutterWindow>(project);
-      fw->SetParams(hide_on_launch, last_window_should_terminate_app, id);
+      fw->SetParams(id);
       Win32Window::Point origin(x, y);
       Win32Window::Size size(width, height);
       if (!fw->Create(title, origin, size)) {
         std::cerr << "Failed to create a new window" << std::endl;
       }
-      fw->Show();
       fw->SetQuitOnClose(false);
       return std::move(fw);
     });

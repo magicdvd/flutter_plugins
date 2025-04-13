@@ -11,10 +11,8 @@ FlutterWindow::FlutterWindow(const flutter::DartProject& project)
 
 FlutterWindow::~FlutterWindow() {}
 
-void FlutterWindow::SetParams(bool hide_on_launch, bool last_window_should_terminate_app, const std::string& id) {
+void FlutterWindow::SetParams(const std::string& id) {
   id_ = id;
-  hide_on_launch_ = hide_on_launch;
-  last_window_should_terminate_app_ = last_window_should_terminate_app;
 }
 
 bool FlutterWindow::OnCreate() {
@@ -35,16 +33,16 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
-  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this(), hide_on_launch_, last_window_should_terminate_app_);
+  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this());
 
-  flutter_controller_->engine()->SetNextFrameCallback([&]() {
-    this->Show();
-  });
+  // flutter_controller_->engine()->SetNextFrameCallback([&]() {
+  //   this->Show();
+  // });
 
-  // Flutter can complete the first frame before the "show window" callback is
-  // registered. The following call ensures a frame is pending to ensure the
-  // window is shown. It is a no-op if the first frame hasn't completed yet.
-  flutter_controller_->ForceRedraw();
+  // // Flutter can complete the first frame before the "show window" callback is
+  // // registered. The following call ensures a frame is pending to ensure the
+  // // window is shown. It is a no-op if the first frame hasn't completed yet.
+  // flutter_controller_->ForceRedraw();
 
   return true;
 }
@@ -61,10 +59,6 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
-
-  if (message == WM_CLOSE) {
-    std::cout << "fwin mh wm_close" << std::endl;
-  }
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =

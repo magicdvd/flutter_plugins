@@ -46,6 +46,10 @@ class MdMultiWindowPlatformWindows extends MdMultiWindowPlatform {
   @override
   Future<bool> doAction(String caller, String callee, String action,
       {Map<String, String>? params}) async {
+    // windows can be show not needed
+    if (action == 'canBeShown') {
+      return true;
+    }
     Map<String, String> iparams = params ?? {};
     iparams['name'] = action;
     final args = MdChannelArguments(
