@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#define MD_DEBUG //开启调试，注释后则关闭
+//#define MD_DEBUG //开启调试，注释后则关闭
 
 #ifdef MD_DEBUG
 #define DEBUG_LOG(x) std::cout << "[DEBUG] " << x << std::endl

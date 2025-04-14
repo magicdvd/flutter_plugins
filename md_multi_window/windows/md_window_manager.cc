@@ -133,7 +133,19 @@ bool MdWindowManager::HandleMesssage(const std::string& id, UINT message,  WPARA
             DEBUG_LOG("window size: " << windows_.size());
         }
         return true;
-      } 
+      }
+    case WM_SIZE: {
+        auto window = GetWindow(id);
+        if (!window){
+          return false;
+        }
+        if (wparam == SIZE_MINIMIZED) {
+          // minimize window
+          window->SendToFlutter("onMinimize");
+        }
+        return false;
+      }
+      // SIZE_RESTORED SIZE_MAXIMIZED
     case WM_DESTROY: {
         if (windows_.size() == 1) {
           PostQuitMessage(0);

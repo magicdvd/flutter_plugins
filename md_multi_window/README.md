@@ -1,6 +1,6 @@
 # md_multi_window
 
-a mulit window support for macos
+a mulit window support for macos & windows
 
 Refer to the code of the three plugins
 
@@ -8,9 +8,7 @@ Refer to the code of the three plugins
 - window_manager [https://github.com/leanflutter/window_manager]
 - bitsdojo_window [https://github.com/bitsdojo/bitsdojo_window]
 
-MacOS support only
-
-## mac
+## macos
 
 create first window manually without xib
 
@@ -85,6 +83,120 @@ override func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleW
     }
     return true
 }
+```
+
+## windows
+
+modify C++ file
+
+1. windows/runner/flutter_windows.h
+2. windows/runner/flutter_windows.cpp
+3. windows/runner/main.h
+
+TODO:
+  1. hide title bar
+  2. custom title bar
+
+```C++
+// windows/runner/flutter_windows.h
+...
+// MODIFY
+class FlutterWindow : public std::enable_shared_from_this<FlutterWindow>, public Win32Window
+...
+ public:
+  // Creates a new FlutterWindow hosting a Flutter view running |project|.
+  explicit FlutterWindow(const flutter::DartProject& project);
+  virtual ~FlutterWindow();
+  // ADD(BEGIN)
+  void SetParams(const std::string& id = "md_mulit_window_main");
+  // ADD(END)
+ protected:
+```
+
+```C++
+// windows/runner/flutter_windows.cpp
+...
+#include "md_multi_window/md_multi_window_plugin_c_api.h"
+...
+
+  SetChildContent(flutter_controller_->view()->GetNativeWindow());
+
+  // ADD this line
+  MdMultiWindowPluginCApiRegister(id_,flutter_controller_->engine(), shared_from_this());
+  
+  // if hide on launch, comment below codes.
+
+  // flutter_controller_->engine()->SetNextFrameCallback([&]() {
+  //   this->Show();
+  // });
+
+  // // Flutter can complete the first frame before the "show window" callback is
+  // // registered. The following call ensures a frame is pending to ensure the
+  // // window is shown. It is a no-op if the first frame hasn't completed yet.
+  // flutter_controller_->ForceRedraw();
+
+...
+
+LRESULT
+FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
+                              WPARAM const wparam,
+  ...
+  switch (message) {
+    case WM_FONTCHANGE:
+      flutter_controller_->engine()->ReloadSystemFonts();
+      break;
+  }
+
+  // ADD for message handle (windows wndproc)
+  if (MdMultiWindowPluginCApiHandleMessagee(id_, message, wparam, lparam)) {
+    return 0;
+  }
+
+  ...
+
+...
+```
+
+
+```C++
+// windows/runner/main.cpp
+  project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
+
+  ...
+  //multi window changeed here(B), make
+  {
+    auto window = std::make_shared<FlutterWindow>(project);
+    // add here
+    window->SetParams();
+    Win32Window::Point origin(10, 10);
+    Win32Window::Size size(1280, 720);
+
+    if (!window->Create(L"md_multi_window_example", origin, size)) {
+      return EXIT_FAILURE;
+    }
+    // true => false
+    window->SetQuitOnClose(false);
+  }
+
+  MdMultiWindowPluginCApiSetCreateWindowCallback(
+    [](std::vector<std::string> command_line_arguments, const std::string& id, const std::wstring& title, unsigned int x, unsigned int y,
+      unsigned int width, unsigned int height) {
+      flutter::DartProject project(L"data");
+
+      project.set_dart_entrypoint_arguments(
+          std::move(command_line_arguments));
+
+      auto fw = std::make_shared<FlutterWindow>(project);
+      fw->SetParams(id);
+      Win32Window::Point origin(x, y);
+      Win32Window::Size size(width, height);
+      if (!fw->Create(title, origin, size)) {
+        std::cerr << "Failed to create a new window" << std::endl;
+      }
+      fw->SetQuitOnClose(false);
+      return std::move(fw);
+    });
+  //multi window changeed here(E)
 ```
 
 ## flutter
